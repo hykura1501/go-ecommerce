@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: hykura
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: ecommerce-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./db/migrations:/docker-entrypoint-initdb.d/
+  ecommerce-api:
+    build: .
+    container_name: ecommerce-api
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: db
+      DB_USER: hykura
+      DB_PASSWORD: 123
+      DB_NAME: ecommerce-db
+      DB_PORT: 5432
+
+volumes:
+  db-data:
