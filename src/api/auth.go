@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/markbates/goth/gothic"
 )
 
 type localLoginRequest struct {
@@ -109,4 +110,16 @@ func (server *Server) register(c echo.Context) error {
 		"message": "Register successfully.",
 		"token":   token,
 	})
+}
+
+func (server *Server) googleLogin(c echo.Context) error {
+	req := c.Request()
+	res := c.Response()
+	req = req.WithContext(context.WithValue(req.Context(), "provider", "google"))
+	gothic.BeginAuthHandler(res, req)
+	return nil
+}
+
+func (server *Server) googleLoginCallback(c echo.Context) error {
+	return c.Redirect(http.StatusOK, os.Getenv("CLIENT_URL"))
 }

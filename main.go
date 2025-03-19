@@ -10,6 +10,8 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/providers/google"
 )
 
 func main() {
@@ -18,6 +20,18 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	var (
+		clientID          = os.Getenv("GOOGLE_CLIENT_ID")
+		clientSecret      = os.Getenv("GOOGLE_CLIENT_SECRET")
+		clientCallbackURL = os.Getenv("GOOGLE_CLIENT_CALLBACK_URI")
+	)
+
+	fmt.Print(clientID, clientSecret, clientCallbackURL)
+
+	goth.UseProviders(
+		google.New(clientID, clientSecret, clientCallbackURL),
+	)
 
 	cnnString := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
@@ -39,5 +53,5 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot create echo server")
 	}
-	server.Start(":8000")
+	server.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }

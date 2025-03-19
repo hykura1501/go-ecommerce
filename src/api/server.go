@@ -29,8 +29,10 @@ func (server *Server) setupRouter() {
 			"message": "Hello World",
 		})
 	})
-	router.POST("/api/auth/login", server.localLogin)
-	router.POST("/api/users", server.register)
+	router.POST("/api/auth/login/local", server.localLogin)
+	router.GET("/api/auth/login/google", server.googleLogin)
+	router.GET("/api/auth/login/google/callback", server.googleLoginCallback)
+	router.POST("/api/users", server.register) // Register
 	server.router = router
 }
 
