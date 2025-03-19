@@ -33,6 +33,7 @@ func (server *Server) setupRouter() {
 	router.GET("/api/auth/login/google", server.googleLogin)
 	router.GET("/api/auth/login/google/callback", server.googleLoginCallback)
 	router.POST("/api/users", server.register) // Register
+
 	server.router = router
 }
 
