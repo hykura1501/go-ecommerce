@@ -39,7 +39,7 @@ func (server *Server) setupRouter() {
 	product := router.Group("/api/products")
 
 	product.GET("/", server.getAllProducts)
-
+	product.GET("/special-products", server.getSpecialProducts)
 	server.router = router
 }
 
