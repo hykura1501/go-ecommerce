@@ -12,6 +12,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countProducts = `-- name: CountProducts :one
+SELECT COUNT(*) AS total_products FROM product
+`
+
+func (q *Queries) CountProducts(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countProducts)
+	var total_products int64
+	err := row.Scan(&total_products)
+	return total_products, err
+}
+
 const getAllProducts = `-- name: GetAllProducts :many
 SELECT 
     p.product_id, 
@@ -20,6 +31,7 @@ SELECT
     p.stock, 
     p.description, 
     p.discount, 
+    p.tag,
     jsonb_build_object('category_id', c.category_id, 'category_name', c.name) AS category,
     jsonb_build_object('manufacturer_id', m.manufacturer_id, 'manufacturer_name', m.manufacturer_name) AS manufacturer,
     jsonb_agg(pi.image_url) AS images
@@ -32,7 +44,13 @@ GROUP BY
     c.category_id, c.name, 
     m.manufacturer_id, m.manufacturer_name
 ORDER BY p.product_id
+LIMIT $1 OFFSET $2
 `
+
+type GetAllProductsParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
 
 type GetAllProductsRow struct {
 	ProductID    int32           `json:"product_id"`
@@ -41,13 +59,14 @@ type GetAllProductsRow struct {
 	Stock        int32           `json:"stock"`
 	Description  *string         `json:"description"`
 	Discount     pgtype.Numeric  `json:"discount"`
+	Tag          *string         `json:"tag"`
 	Category     json.RawMessage `json:"category"`
 	Manufacturer json.RawMessage `json:"manufacturer"`
 	Images       json.RawMessage `json:"images"`
 }
 
-func (q *Queries) GetAllProducts(ctx context.Context) ([]GetAllProductsRow, error) {
-	rows, err := q.db.Query(ctx, getAllProducts)
+func (q *Queries) GetAllProducts(ctx context.Context, arg GetAllProductsParams) ([]GetAllProductsRow, error) {
+	rows, err := q.db.Query(ctx, getAllProducts, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -62,6 +81,7 @@ func (q *Queries) GetAllProducts(ctx context.Context) ([]GetAllProductsRow, erro
 			&i.Stock,
 			&i.Description,
 			&i.Discount,
+			&i.Tag,
 			&i.Category,
 			&i.Manufacturer,
 			&i.Images,
@@ -84,6 +104,7 @@ SELECT
     p.stock, 
     p.description, 
     p.discount, 
+    p.tag,
     jsonb_build_object('category_id', c.category_id, 'category_name', c.name) AS category,
     jsonb_build_object('manufacturer_id', m.manufacturer_id, 'manufacturer_name', m.manufacturer_name) AS manufacturer,
     COALESCE(jsonb_agg(pi.image_url) FILTER (WHERE pi.image_url IS NOT NULL), '[]'::jsonb) AS images
@@ -107,6 +128,7 @@ type GetNewArrivalProductsRow struct {
 	Stock        int32           `json:"stock"`
 	Description  *string         `json:"description"`
 	Discount     pgtype.Numeric  `json:"discount"`
+	Tag          *string         `json:"tag"`
 	Category     json.RawMessage `json:"category"`
 	Manufacturer json.RawMessage `json:"manufacturer"`
 	Images       interface{}     `json:"images"`
@@ -128,6 +150,7 @@ func (q *Queries) GetNewArrivalProducts(ctx context.Context) ([]GetNewArrivalPro
 			&i.Stock,
 			&i.Description,
 			&i.Discount,
+			&i.Tag,
 			&i.Category,
 			&i.Manufacturer,
 			&i.Images,
