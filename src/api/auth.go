@@ -1,10 +1,10 @@
 package api
 
 import (
-	db "BE_Ecommerce/db/sqlc"
-	"BE_Ecommerce/src/helpers"
+	"BE_Ecommerce/db/repositories"
+	"BE_Ecommerce/src/entity"
+	"BE_Ecommerce/src/pkg"
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -14,102 +14,75 @@ import (
 )
 
 type localLoginRequest struct {
-	Username *string `json:"username"`
-	Password *string `json:"password"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type registerRequest struct {
-	Fullname *string `json:"fullname"`
-	Username *string `json:"username"`
-	Password *string `json:"password"`
+	Fullname string `json:"fullname"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func (server *Server) localLogin(c echo.Context) error {
 	var req localLoginRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{
-			"code":    http.StatusBadRequest,
-			"message": "Error binding",
-		})
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
 	}
 
-	fmt.Println(req)
-
-	user, err := server.store.GetUserByUsername(context.Background(), req.Username)
-
-	fmt.Println(user)
+	user, err := repositories.GetUserByUsername(server.dbInstance, req.Username)
 
 	if err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{
-			"code":    http.StatusNotFound,
-			"message": "User is not existed!",
-		})
+		return c.JSON(http.StatusNotFound, pkg.ResponseError(pkg.ErrorUserNotExisted, err))
 	}
-	isTheSamePassword := helpers.ComparePasswords(*user.Password, []byte(*req.Password))
-	if !isTheSamePassword {
-		return c.JSON(http.StatusNotFound, echo.Map{
-			"code":    http.StatusNotFound,
-			"message": "Password is incorrect!",
-		})
+
+	isValidPassword := pkg.ComparePasswords(*user.Password, []byte(req.Password))
+
+	if !isValidPassword {
+		return c.JSON(http.StatusNotFound, pkg.ResponseError(pkg.ErrorPasswordIncorrect, err))
 	}
+
 	// return token
-	token, err := helpers.GenerateToken(user.UserID, user.Permission)
+	token, err := pkg.GenerateToken(user.UserId, user.Permission)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"code":    http.StatusInternalServerError,
-			"message": "Failed to generate token!",
-		})
+		return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorGenerateToken, err))
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"code":    http.StatusOK,
-		"token":   token,
-		"message": "Login successfully.",
-	})
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoLoginSuccess, echo.Map{
+		"token": token,
+	}))
 
 }
 
 func (server *Server) register(c echo.Context) error {
 	var req registerRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{
-			"code":    http.StatusBadRequest,
-			"message": "Error binding",
-		})
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
 	}
 
-	hashedPassword := helpers.HashAndSalt([]byte(*req.Password))
-	fmt.Println(hashedPassword)
+	hashedPassword := pkg.HashAndSalt([]byte(req.Password))
 
-	value, _ := strconv.Atoi(os.Getenv("PROVIDER_LOCAL"))
-	PROVIDER_LOCAL := int32(value)
+	PROVIDER_LOCAL, _ := strconv.Atoi(os.Getenv("PROVIDER_LOCAL"))
 
-	user, err := server.store.CreateUser(context.Background(), db.CreateUserParams{
-		Fullname:      req.Fullname,
-		Username:      req.Username,
+	user, err := repositories.CreateUser(server.dbInstance, &entity.User{
+		Username:      &req.Username,
 		Password:      &hashedPassword,
-		Permission:    0,
+		Fullname:      &req.Fullname,
 		LoginProvider: &PROVIDER_LOCAL,
+		Permission:    0,
 	})
 
 	if err != nil {
-		return c.JSON(http.StatusConflict, echo.Map{
-			"code":    http.StatusConflict,
-			"message": "Email already existed",
-		})
+		return c.JSON(http.StatusConflict, pkg.ResponseError(pkg.ErrorUserExisted, err))
 	}
-	token, err := helpers.GenerateToken(user.UserID, user.Permission)
+
+	token, err := pkg.GenerateToken(user.UserId, user.Permission)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"code":    http.StatusInternalServerError,
-			"message": "Failed to generate token!",
-		})
+		return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorGenerateToken, err))
 	}
-	return c.JSON(http.StatusCreated, echo.Map{
-		"code":    http.StatusCreated,
-		"message": "Register successfully.",
-		"token":   token,
-	})
+	return c.JSON(http.StatusCreated, pkg.ResponseSuccessWithData(pkg.InfoRegisterSuccess, echo.Map{
+		"token": token,
+	}))
 }
 
 func (server *Server) googleLogin(c echo.Context) error {

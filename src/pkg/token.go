@@ -1,4 +1,4 @@
-package helpers
+package pkg
 
 import (
 	"os"
@@ -8,8 +8,8 @@ import (
 )
 
 type JwtCustomClaims struct {
-	UserID     int32 `json:"user_id"`
-	Permission int32 `json:"permission"`
+	UserID     int `json:"user_id"`
+	Permission int `json:"permission"`
 	jwt.RegisteredClaims
 }
 
@@ -17,7 +17,7 @@ var (
 	JWT_SECRET = os.Getenv("JWT_SECRET")
 )
 
-func GenerateToken(userId int32, permission int32) (string, error) {
+func GenerateToken(userId int, permission int) (string, error) {
 	claims := &JwtCustomClaims{
 		userId,
 		permission,
