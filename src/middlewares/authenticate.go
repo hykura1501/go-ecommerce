@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"BE_Ecommerce/src/helpers"
+	"BE_Ecommerce/src/pkg"
 	"os"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -18,7 +18,7 @@ func Authenticate() echo.MiddlewareFunc {
 
 	config := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(helpers.JwtCustomClaims)
+			return new(pkg.JwtCustomClaims)
 		},
 		SigningKey: []byte(JWT_SECRET),
 	}

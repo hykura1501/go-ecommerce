@@ -1,17 +1,13 @@
 package main
 
 import (
-	db "BE_Ecommerce/db/sqlc"
+	"BE_Ecommerce/db"
 	"BE_Ecommerce/src/api"
-	"context"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
-	"github.com/markbates/goth"
-	"github.com/markbates/goth/providers/google"
 )
 
 func main() {
@@ -21,35 +17,15 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	var (
-		clientID          = os.Getenv("GOOGLE_CLIENT_ID")
-		clientSecret      = os.Getenv("GOOGLE_CLIENT_SECRET")
-		clientCallbackURL = os.Getenv("GOOGLE_CLIENT_CALLBACK_URI")
-	)
+	dbInstance, err := db.Connect()
 
-	fmt.Print(clientID, clientSecret, clientCallbackURL)
-
-	goth.UseProviders(
-		google.New(clientID, clientSecret, clientCallbackURL),
-	)
-
-	cnnString := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
-		os.Getenv("DB_PORT"),
-	)
-
-	connPool, err := pgxpool.New(context.Background(), cnnString)
 	if err != nil {
-		log.Fatal("cannot connect to postgres!")
+		log.Fatal("cannot connect to db")
 	}
 
-	store := db.NewStore(connPool)
+	defer db.Close(dbInstance)
 
-	server, err := api.NewServer(store)
+	server, err := api.NewServer(dbInstance)
 	if err != nil {
 		log.Fatal("cannot create echo server")
 	}

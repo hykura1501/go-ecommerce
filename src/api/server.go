@@ -1,20 +1,20 @@
 package api
 
 import (
-	db "BE_Ecommerce/db/sqlc"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 type Server struct {
-	store  db.Store
-	router *echo.Echo
+	dbInstance *gorm.DB
+	router     *echo.Echo
 }
 
-func NewServer(store db.Store) (*Server, error) {
+func NewServer(dbInstance *gorm.DB) (*Server, error) {
 	server := &Server{
-		store: store,
+		dbInstance: dbInstance,
 	}
 	server.setupRouter()
 
@@ -36,10 +36,10 @@ func (server *Server) setupRouter() {
 
 	// product api
 
-	product := router.Group("/api/products")
+	// product := router.Group("/api/products")
 
-	product.GET("", server.getAllProducts)
-	product.GET("/special-products", server.getSpecialProducts)
+	// product.GET("", server.getAllProducts)
+	// product.GET("/special-products", server.getSpecialProducts)
 	server.router = router
 }
 
