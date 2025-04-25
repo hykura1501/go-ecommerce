@@ -13,11 +13,34 @@ import (
 )
 
 const countProducts = `-- name: CountProducts :one
-SELECT COUNT(*) AS total_products FROM product
+SELECT COUNT(DISTINCT p.product_id) AS total_products 
+FROM product p 
+LEFT JOIN product_image pi ON pi.product_id = p.product_id
+LEFT JOIN category c ON c.category_id = p.category_id
+LEFT JOIN manufacturer m ON m.manufacturer_id = p.manufacturer_id
+WHERE ($1::integer = 0 OR p.category_id = $1) 
+AND ($2::text = '' OR p.tag = $2) 
+AND ($3::integer = 0 OR p.price >= $3)
+AND ($4::integer = 0 OR p.price <= $4)
+AND ($5::text = '' OR p.product_name ILIKE CONCAT('%', $5, '%'))
 `
 
-func (q *Queries) CountProducts(ctx context.Context) (int64, error) {
-	row := q.db.QueryRow(ctx, countProducts)
+type CountProductsParams struct {
+	CategoryID *int32  `json:"category_id"`
+	Tag        *string `json:"tag"`
+	PriceMin   *int32  `json:"price_min"`
+	PriceMax   *int32  `json:"price_max"`
+	Search     *string `json:"search"`
+}
+
+func (q *Queries) CountProducts(ctx context.Context, arg CountProductsParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countProducts,
+		arg.CategoryID,
+		arg.Tag,
+		arg.PriceMin,
+		arg.PriceMax,
+		arg.Search,
+	)
 	var total_products int64
 	err := row.Scan(&total_products)
 	return total_products, err
@@ -34,11 +57,16 @@ SELECT
     p.tag,
     jsonb_build_object('category_id', c.category_id, 'category_name', c.name) AS category,
     jsonb_build_object('manufacturer_id', m.manufacturer_id, 'manufacturer_name', m.manufacturer_name) AS manufacturer,
-    jsonb_agg(pi.image_url) AS images
+    COALESCE(jsonb_agg(pi.image_url) FILTER (WHERE pi.image_url IS NOT NULL), '[]'::jsonb) AS images
 FROM product p 
 LEFT JOIN product_image pi ON pi.product_id = p.product_id
 LEFT JOIN category c ON c.category_id = p.category_id
 LEFT JOIN manufacturer m ON m.manufacturer_id = p.manufacturer_id
+WHERE ($3::integer = 0 OR p.category_id = $3) 
+AND ($4::text = '' OR p.tag = $4) 
+AND ($5::integer = 0 OR p.price >= $5)
+AND ($6::integer = 0 OR p.price <= $6)
+AND ($7::text = '' OR p.product_name ILIKE CONCAT('%', $7, '%'))
 GROUP BY 
     p.product_id, p.product_name, p.price, p.stock, p.description, p.discount, 
     c.category_id, c.name, 
@@ -48,8 +76,13 @@ LIMIT $1 OFFSET $2
 `
 
 type GetAllProductsParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	Limit      int32  `json:"limit"`
+	Offset     int32  `json:"offset"`
+	CategoryID int32  `json:"category_id"`
+	Tag        string `json:"tag"`
+	PriceMin   int32  `json:"price_min"`
+	PriceMax   int32  `json:"price_max"`
+	Search     string `json:"search"`
 }
 
 type GetAllProductsRow struct {
@@ -62,11 +95,19 @@ type GetAllProductsRow struct {
 	Tag          *string         `json:"tag"`
 	Category     json.RawMessage `json:"category"`
 	Manufacturer json.RawMessage `json:"manufacturer"`
-	Images       json.RawMessage `json:"images"`
+	Images       interface{}     `json:"images"`
 }
 
 func (q *Queries) GetAllProducts(ctx context.Context, arg GetAllProductsParams) ([]GetAllProductsRow, error) {
-	rows, err := q.db.Query(ctx, getAllProducts, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, getAllProducts,
+		arg.Limit,
+		arg.Offset,
+		arg.CategoryID,
+		arg.Tag,
+		arg.PriceMin,
+		arg.PriceMax,
+		arg.Search,
+	)
 	if err != nil {
 		return nil, err
 	}

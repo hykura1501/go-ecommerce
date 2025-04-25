@@ -2,23 +2,49 @@ package api
 
 import (
 	db "BE_Ecommerce/db/sqlc"
-	"BE_Ecommerce/src/helpers"
+	"BE_Ecommerce/src/api/entity"
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
 
 func (server *Server) getAllProducts(c echo.Context) error {
-	page := c.QueryParam("page")
-	perPage := c.QueryParam("per_page")
+	var req entity.ProductRequest
 
-	paging := helpers.ToPaging(page, perPage)
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"code":    http.StatusBadRequest,
+			"message": "Failed to bind request",
+			"error":   err.Error(),
+		})
+	}
 
-	products, err := server.store.GetAllProducts(context.Background(), db.GetAllProductsParams{
-		Offset: paging.PerPage * (paging.Page - 1),
-		Limit:  paging.PerPage,
-	})
+	paging := entity.ToPaging(req.Page, req.PerPage)
+
+	sort, isValid := entity.SortProductsOptions[req.Sort]
+
+	if !isValid {
+		req.SortBy = "p.product_id"
+		req.SortValue = "asc"
+	} else {
+		req.SortBy, req.SortValue = strings.Split(sort, " ")[0], strings.Split(sort, " ")[1]
+	}
+
+	getParams := db.GetAllProductsParams{
+		Offset:     paging.Offset,
+		Limit:      paging.Limit,
+		Search:     &req.Search,
+		SortBy:     &req.SortBy,
+		SortValue:  &req.SortValue,
+		CategoryID: &req.CategoryId,
+		Tag:        &req.Tag,
+		PriceMin:   &req.PriceMin,
+		PriceMax:   &req.PriceMax,
+	}
+
+	products, err := server.store.GetAllProducts(context.Background(), getParams)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
@@ -28,7 +54,15 @@ func (server *Server) getAllProducts(c echo.Context) error {
 		})
 	}
 
-	counts, err := server.store.CountProducts(context.Background())
+	countParams := db.CountProductsParams{
+		Search:     &req.Search,
+		CategoryID: &req.CategoryId,
+		Tag:        &req.Tag,
+		PriceMin:   &req.PriceMin,
+		PriceMax:   &req.PriceMax,
+	}
+
+	counts, err := server.store.CountProducts(context.Background(), countParams)
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
@@ -38,8 +72,7 @@ func (server *Server) getAllProducts(c echo.Context) error {
 		})
 	}
 
-	paging.TotalItems = int32(counts)
-	paging.TotalPages = (paging.TotalItems + paging.PerPage - 1) / paging.PerPage
+	paging.SetTotalPages(counts)
 
 	return c.JSON(http.StatusOK, echo.Map{
 		"code":     http.StatusOK,
