@@ -10,4 +10,5 @@ const (
 	InfoGetProductsSuccess        = "get products success."
 	InfoGetProductDetailSuccess   = "get product detail success."
 	InfoGetSpecialProductsSuccess = "get special products success."
+	InfoCreateProductSuccess      = "create product success."
 )

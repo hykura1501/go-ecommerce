@@ -4,6 +4,7 @@ import (
 	"BE_Ecommerce/db/repositories"
 	"BE_Ecommerce/src/entity"
 	"BE_Ecommerce/src/pkg"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -73,4 +74,9 @@ func (server *Server) getSpecialProducts(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetSpecialProductsSuccess, results))
+}
+
+func (server *Server) createProduct(c echo.Context) error {
+	fmt.Println("Creating product...")
+	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoCreateProductSuccess))
 }

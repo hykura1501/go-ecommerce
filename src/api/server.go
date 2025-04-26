@@ -1,6 +1,8 @@
 package api
 
 import (
+	"BE_Ecommerce/src/middlewares"
+
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -30,6 +32,7 @@ func (server *Server) setupRouter() {
 
 	// product api
 	api.GET("/products", server.getAllProducts)
+	api.POST("/products/create", server.createProduct, middlewares.Authenticate(), middlewares.IsAdmin())
 	api.GET("/products/detail/:product_id", server.getProductDetail)
 	api.GET("/products/special-products", server.getSpecialProducts)
 	server.router = router
