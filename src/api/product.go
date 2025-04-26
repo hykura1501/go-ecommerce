@@ -1,88 +1,49 @@
 package api
 
-// import (
-// 	db "BE_Ecommerce/db/sqlc"
-// 	"BE_Ecommerce/src/api/entity"
-// 	"net/http"
-// 	"strings"
+import (
+	"BE_Ecommerce/db/repositories"
+	"BE_Ecommerce/src/entity"
+	"BE_Ecommerce/src/pkg"
+	"log"
+	"net/http"
 
-// 	"github.com/labstack/echo/v4"
-// )
+	"github.com/labstack/echo/v4"
+)
 
-// func (server *Server) getAllProducts(c echo.Context) error {
-// 	var req entity.ProductRequest
+func (server *Server) getAllProducts(c echo.Context) error {
+	var req entity.ProductQuery
 
-// 	if err := c.Bind(&req); err != nil {
-// 		return c.JSON(http.StatusBadRequest, echo.Map{
-// 			"code":    http.StatusBadRequest,
-// 			"message": "Failed to bind request",
-// 			"error":   err.Error(),
-// 		})
-// 	}
+	if err := c.Bind(&req); err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
 
-// 	paging := entity.ToPaging(req.Page, req.PerPage)
+	sort, isValid := entity.SortProductsOptions[req.Sort]
 
-// 	sort, isValid := entity.SortProductsOptions[req.Sort]
+	if isValid {
+		req.OrderBy = sort
+	} else {
+		req.OrderBy = entity.SortProductsOptions["product_id_asc"]
+	}
 
-// 	if !isValid {
-// 		req.SortBy = "p.product_id"
-// 		req.SortValue = "asc"
-// 	} else {
-// 		req.SortBy, req.SortValue = strings.Split(sort, " ")[0], strings.Split(sort, " ")[1]
-// 	}
+	req.ToPaging()
+	products, err := repositories.GetAllProducts(server.dbInstance, &req)
 
-// 	getParams := db.GetAllProductsParams{
-// 		Offset:     paging.Offset,
-// 		Limit:      paging.Limit,
-// 		Search:     &req.Search,
-// 		SortBy:     &req.SortBy,
-// 		SortValue:  &req.SortValue,
-// 		CategoryID: &req.CategoryId,
-// 		Tag:        &req.Tag,
-// 		PriceMin:   &req.PriceMin,
-// 		PriceMax:   &req.PriceMax,
-// 	}
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetData, err))
+	}
 
-// 	// products, err := server.store.GetAllProducts(context.Background(), getParams)
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetProductsSuccess, echo.Map{
+		"products": products,
+		"paging":   req.Paging,
+	}))
+}
 
-// 	// if err != nil {
-// 	// 	return c.JSON(http.StatusBadRequest, echo.Map{
-// 	// 		"code":    http.StatusBadRequest,
-// 	// 		"message": "Failed to get all products",
-// 	// 		"error":   err.Error(),
-// 	// 	})
-// 	// }
+func (server *Server) getSpecialProducts(c echo.Context) error {
+	// newArrivalProducts, _ := server.store.GetNewArrivalProducts(context.Background())
 
-// 	// countParams := db.CountProductsParams{
-// 	// 	Search:     &req.Search,
-// 	// 	CategoryID: &req.CategoryId,
-// 	// 	Tag:        &req.Tag,
-// 	// 	PriceMin:   &req.PriceMin,
-// 	// 	PriceMax:   &req.PriceMax,
-// 	// }
-
-// 	// counts, err := server.store.CountProducts(context.Background(), countParams)
-
-// 	// if err != nil {
-// 	// 	return c.JSON(http.StatusBadRequest, echo.Map{
-// 	// 		"code":    http.StatusBadRequest,
-// 	// 		"message": "Failed to get all products",
-// 	// 		"error":   err.Error(),
-// 	// 	})
-// 	// }
-
-// 	// paging.SetTotalPages(counts)
-
-// 	return c.JSON(http.StatusOK, echo.Map{
-// 		"code":   http.StatusOK,
-// 		"paging": paging,
-// 	})
-// }
-
-// func (server *Server) getSpecialProducts(c echo.Context) error {
-// 	// newArrivalProducts, _ := server.store.GetNewArrivalProducts(context.Background())
-
-// 	return c.JSON(200, echo.Map{
-// 		"products": nil,
-// 	})
-// }
+	return c.JSON(200, echo.Map{
+		"products": nil,
+	})
+}

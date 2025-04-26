@@ -1,25 +1,42 @@
 package entity
 
-type ProductRequest struct {
-	Page       int32  `json:"page" query:"page"`
-	PerPage    int32  `json:"per_page" query:"per_page"`
-	CategoryId int32  `json:"category_id" query:"category_id"`
+type Product struct {
+	ProductId      int     `json:"product_id"`
+	ProductName    string  `json:"product_name"`
+	Price          float32 `json:"price"`
+	Stock          int     `json:"stock"`
+	Description    string  `json:"description"`
+	CategoryId     int     `json:"category_id"`
+	ManufacturerId string  `json:"manufacturer_id"`
+	CreatedAt      string  `json:"created_at"`
+	UpdatedAt      string  `json:"updated_at"`
+	Discount       float32 `json:"discount"`
+	Type           string  `json:"type"`
+	Tag            string  `json:"tag"`
+}
+
+func (p *Product) TableName() string {
+	return "product"
+}
+
+type ProductQuery struct {
+	Paging
+	CategoryId int    `json:"category_id" query:"category_id"`
 	Tag        string `json:"tag" query:"tag"`
 	Search     string `json:"search" query:"search"`
-	PriceMin   int32  `json:"price_min" query:"price_min"`
-	PriceMax   int32  `json:"price_max" query:"price_max"`
+	PriceMin   int    `json:"price_min" query:"price_min"`
+	PriceMax   int    `json:"price_max" query:"price_max"`
 	Sort       string `json:"sort" query:"sort"`
-	SortBy     string
-	SortValue  string
+	OrderBy    string
 }
 
 var SortProductsOptions = map[string]string{
-	"product_id_asc":    "product_id asc",
-	"product_id_desc":   "product_id desc",
-	"price_asc":         "price asc",
-	"price_desc":        "price desc",
-	"created_at_asc":    "created_at asc",
-	"created_at_desc":   "created_at desc",
-	"product_name_asc":  "product_name asc",
-	"product_name_desc": "product_name desc",
+	"product_id_asc":    "p.product_id asc",
+	"product_id_desc":   "p.product_id desc",
+	"price_asc":         "p.price asc",
+	"price_desc":        "p.price desc",
+	"created_at_asc":    "p.created_at asc",
+	"created_at_desc":   "p.created_at desc",
+	"product_name_asc":  "p.product_name asc",
+	"product_name_desc": "p.product_name desc",
 }

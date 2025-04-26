@@ -1,8 +1,6 @@
 package api
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -23,23 +21,16 @@ func NewServer(dbInstance *gorm.DB) (*Server, error) {
 
 func (server *Server) setupRouter() {
 	router := echo.New()
-	router.GET("/test", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, echo.Map{
-			"code":    http.StatusOK,
-			"message": "Hello World",
-		})
-	})
+
+	// auth api
 	router.POST("/api/auth/login/local", server.localLogin)
+	router.POST("/api/users", server.register) // Register
 	router.GET("/api/auth/login/google", server.googleLogin)
 	router.GET("/api/auth/login/google/callback", server.googleLoginCallback)
-	router.POST("/api/users", server.register) // Register
 
 	// product api
-
-	// product := router.Group("/api/products")
-
-	// product.GET("", server.getAllProducts)
-	// product.GET("/special-products", server.getSpecialProducts)
+	router.GET("/api/products", server.getAllProducts)
+	router.GET("/api/products/special-products", server.getSpecialProducts)
 	server.router = router
 }
 
