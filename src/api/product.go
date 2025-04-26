@@ -41,6 +41,24 @@ func (server *Server) getAllProducts(c echo.Context) error {
 	}))
 }
 
+func (server *Server) getProductDetail(c echo.Context) error {
+	productIdStr := c.Param("product_id")
+	productId, err := strconv.Atoi(productIdStr)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
+
+	product, err := repositories.GetProductDetail(server.dbInstance, productId)
+
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetData, err))
+	}
+
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetProductDetailSuccess, product))
+}
+
 func (server *Server) getSpecialProducts(c echo.Context) error {
 	sizeStr := c.QueryParam("size")
 	size, err := strconv.Atoi(sizeStr)
@@ -54,5 +72,5 @@ func (server *Server) getSpecialProducts(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetData, err))
 	}
 
-	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetProductsSuccess, results))
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetSpecialProductsSuccess, results))
 }

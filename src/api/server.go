@@ -21,16 +21,17 @@ func NewServer(dbInstance *gorm.DB) (*Server, error) {
 
 func (server *Server) setupRouter() {
 	router := echo.New()
-
+	api := router.Group("/api")
 	// auth api
-	router.POST("/api/auth/login/local", server.localLogin)
-	router.POST("/api/users", server.register) // Register
-	router.GET("/api/auth/login/google", server.googleLogin)
-	router.GET("/api/auth/login/google/callback", server.googleLoginCallback)
+	api.POST("/auth/login/local", server.localLogin)
+	api.POST("/users", server.register) // Register
+	api.GET("/auth/login/google", server.googleLogin)
+	api.GET("/auth/login/google/callback", server.googleLoginCallback)
 
 	// product api
-	router.GET("/api/products", server.getAllProducts)
-	router.GET("/api/products/special-products", server.getSpecialProducts)
+	api.GET("/products", server.getAllProducts)
+	api.GET("/products/detail/:product_id", server.getProductDetail)
+	api.GET("/products/special-products", server.getSpecialProducts)
 	server.router = router
 }
 
