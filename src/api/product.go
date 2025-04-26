@@ -4,8 +4,10 @@ import (
 	"BE_Ecommerce/db/repositories"
 	"BE_Ecommerce/src/entity"
 	"BE_Ecommerce/src/pkg"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -41,7 +43,13 @@ func (server *Server) getAllProducts(c echo.Context) error {
 }
 
 func (server *Server) getSpecialProducts(c echo.Context) error {
-	// newArrivalProducts, _ := server.store.GetNewArrivalProducts(context.Background())
+	sizeStr := c.QueryParam("size")
+	size, err := strconv.Atoi(sizeStr)
+	if err != nil {
+		size = 20
+	}
+	fmt.Println("size", size)
+	// results := repositories.GetSpecialProducts(server.dbInstance, size)
 
 	return c.JSON(200, echo.Map{
 		"products": nil,

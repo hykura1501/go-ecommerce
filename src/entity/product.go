@@ -1,18 +1,19 @@
 package entity
 
 type Product struct {
-	ProductId      int     `json:"product_id"`
-	ProductName    string  `json:"product_name"`
-	Price          float32 `json:"price"`
-	Stock          int     `json:"stock"`
-	Description    string  `json:"description"`
-	CategoryId     int     `json:"category_id"`
-	ManufacturerId string  `json:"manufacturer_id"`
-	CreatedAt      string  `json:"created_at"`
-	UpdatedAt      string  `json:"updated_at"`
-	Discount       float32 `json:"discount"`
-	Type           string  `json:"type"`
-	Tag            string  `json:"tag"`
+	ProductId    int          `json:"product_id"`
+	ProductName  string       `json:"product_name"`
+	Price        float32      `json:"price"`
+	Stock        int          `json:"stock"`
+	Description  string       `json:"description"`
+	Category     Category     `json:"category"`
+	Manufacturer Manufacturer `json:"manufacturer"`
+	Images       StringArray  `json:"images"`
+	CreatedAt    string       `json:"created_at"`
+	UpdatedAt    string       `json:"updated_at"`
+	Discount     float32      `json:"discount"`
+	Type         string       `json:"type"`
+	Tag          string       `json:"tag"`
 }
 
 func (p *Product) TableName() string {
@@ -28,6 +29,13 @@ type ProductQuery struct {
 	PriceMax   int    `json:"price_max" query:"price_max"`
 	Sort       string `json:"sort" query:"sort"`
 	OrderBy    string
+}
+
+type SpecialProductList struct {
+	NewArrival      []Product `json:"new_arrival"`
+	BestSeller      []Product `json:"best_seller"`
+	Featured        []Product `json:"featured"`
+	HighestDiscount []Product `json:"highest_discount"`
 }
 
 var SortProductsOptions = map[string]string{
