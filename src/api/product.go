@@ -4,7 +4,6 @@ import (
 	"BE_Ecommerce/db/repositories"
 	"BE_Ecommerce/src/entity"
 	"BE_Ecommerce/src/pkg"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -48,10 +47,12 @@ func (server *Server) getSpecialProducts(c echo.Context) error {
 	if err != nil {
 		size = 20
 	}
-	fmt.Println("size", size)
-	// results := repositories.GetSpecialProducts(server.dbInstance, size)
+	results, err := repositories.GetSpecialProducts(server.dbInstance, size)
 
-	return c.JSON(200, echo.Map{
-		"products": nil,
-	})
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetData, err))
+	}
+
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetProductsSuccess, results))
 }
