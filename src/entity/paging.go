@@ -1,8 +1,8 @@
 package entity
 
 type Paging struct {
-	Page       int `json:"page"`
-	PerPage    int `json:"per_page"`
+	Page       int `json:"page" query:"page"`
+	PerPage    int `json:"per_page" query:"per_page"`
 	TotalPages int `json:"total_pages"`
 	TotalItems int `json:"total_items"`
 	Limit      int `json:"-"`
