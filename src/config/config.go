@@ -20,6 +20,11 @@ type Env struct {
 	GoogleClientID     string
 	GoogleClientSecret string
 	GoogleRedirectURI  string
+
+	// Cloudinary (Upload Images)
+	CloudName      string
+	CloudApiKey    string
+	CloudApiSecret string
 }
 
 var env *Env
@@ -40,6 +45,9 @@ func LoadEnv() *Env {
 		GoogleClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 		GoogleRedirectURI:  os.Getenv("GOOGLE_CLIENT_REDIRECT_URI"),
+		CloudName:          os.Getenv("CLOUDINARY_CLOUD_NAME"),
+		CloudApiKey:        os.Getenv("CLOUDINARY_API_KEY"),
+		CloudApiSecret:     os.Getenv("CLOUDINARY_API_SECRET"),
 	}
 
 	return env

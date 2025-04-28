@@ -2,7 +2,7 @@ package main
 
 import (
 	"BE_Ecommerce/db"
-	"BE_Ecommerce/src/api"
+	"BE_Ecommerce/src/handler"
 	"fmt"
 	"log"
 	"os"
@@ -25,7 +25,7 @@ func main() {
 
 	defer db.Close(dbInstance)
 
-	server, err := api.NewServer(dbInstance)
+	server, err := handler.NewServer(dbInstance)
 	if err != nil {
 		log.Fatal("cannot create echo server")
 	}

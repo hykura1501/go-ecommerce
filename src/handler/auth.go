@@ -1,4 +1,4 @@
-package api
+package handler
 
 import (
 	"BE_Ecommerce/db/repositories"
@@ -13,19 +13,8 @@ import (
 	"github.com/markbates/goth/gothic"
 )
 
-type localLoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type registerRequest struct {
-	Fullname string `json:"fullname"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 func (server *Server) localLogin(c echo.Context) error {
-	var req localLoginRequest
+	var req entity.LocalLoginRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
 	}
@@ -55,7 +44,7 @@ func (server *Server) localLogin(c echo.Context) error {
 }
 
 func (server *Server) register(c echo.Context) error {
-	var req registerRequest
+	var req entity.RegisterRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
 	}

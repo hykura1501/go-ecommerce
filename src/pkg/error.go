@@ -1,10 +1,16 @@
 package pkg
 
 const (
+	// Common
+	ErrorGetData        = "error get data"
+	ErrorCreateData     = "error create data"
+	ErrorBindingData    = "error binding data"
+	ErrorRecordNotFound = "record not found"
+	ErrorUploadImage    = "error upload image"
 	// Auth
-	ErrorBindingData       = "Error binding data."
-	ErrorUserNotExisted    = "User is not existed."
-	ErrorPasswordIncorrect = "Password is incorrect."
-	ErrorGenerateToken     = "Error generate token."
-	ErrorUserExisted       = "User is existed."
+	ErrorUserNotExisted    = "user is not existed"
+	ErrorPasswordIncorrect = "password is incorrect"
+	ErrorGenerateToken     = "error generate token"
+	ErrorUserExisted       = "user is existed"
+	ErrorForbidden         = "forbidden"
 )

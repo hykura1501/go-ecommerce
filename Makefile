@@ -7,15 +7,9 @@ postgres:
 		-e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_PASSWORD) \
 		-d postgres:latest
 
-postgres1:
-	docker run --name loyaltyapp -p 5432:5432 \
-		-e POSTGRES_USER=hykura -e POSTGRES_PASSWORD=hykura \
-		-d postgres:latest
-
-
 # Tạo database bên trong container
 createdb:
-	docker exec -it loyaltyapp createdb --username=hykura --owner=hykura loyaltyappdb
+	docker exec -it $(POSTGRES_CONTAINER) createdb --username=$(DB_USER) --owner=$(DB_USER) $(DB_NAME)
 
 # Xóa container PostgreSQL
 stopdb:

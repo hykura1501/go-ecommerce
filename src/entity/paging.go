@@ -1,30 +1,26 @@
 package entity
 
 type Paging struct {
-	Page       int32 `json:"page"`
-	PerPage    int32 `json:"per_page"`
-	TotalPages int32 `json:"total_pages"`
-	TotalItems int32 `json:"total_items"`
-	Limit      int32 `json:"-"`
-	Offset     int32 `json:"-"`
+	Page       int `json:"page"`
+	PerPage    int `json:"per_page"`
+	TotalPages int `json:"total_pages"`
+	TotalItems int `json:"total_items"`
+	Limit      int `json:"-"`
+	Offset     int `json:"-"`
 }
 
-func ToPaging(page, perPage int32) Paging {
-	if page == 0 {
-		page = 1
+func (p *Paging) ToPaging() {
+	if p.Page == 0 {
+		p.Page = 1
 	}
-	if perPage == 0 {
-		perPage = 10
+	if p.PerPage == 0 {
+		p.PerPage = 10
 	}
-	return Paging{
-		Page:    page,
-		PerPage: perPage,
-		Limit:   perPage,
-		Offset:  (page - 1) * perPage,
-	}
+	p.Limit = p.PerPage
+	p.Offset = (p.Page - 1) * p.PerPage
 }
 
 func (p *Paging) SetTotalPages(counts int64) {
-	p.TotalItems = int32(counts)
+	p.TotalItems = int(counts)
 	p.TotalPages = (p.TotalItems + p.PerPage - 1) / p.PerPage
 }
