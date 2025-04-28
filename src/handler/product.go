@@ -1,10 +1,9 @@
-package api
+package handler
 
 import (
 	"BE_Ecommerce/db/repositories"
 	"BE_Ecommerce/src/entity"
 	"BE_Ecommerce/src/pkg"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -77,6 +76,26 @@ func (server *Server) getSpecialProducts(c echo.Context) error {
 }
 
 func (server *Server) createProduct(c echo.Context) error {
-	fmt.Println("Creating product...")
+	var req entity.NewProductRequest
+	if err := c.Bind(&req); err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
+	// handle uploading images
+	if req.Images != nil {
+		urls, err := pkg.UploadMultipleImages(req.Images, pkg.ProductImageFolder)
+		if err != nil {
+			log.Println(err.Error())
+			return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorUploadImage, err))
+		}
+		req.ImageUrls = urls
+	}
+
+	err := repositories.CreateProduct(server.dbInstance, &req)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorCreateData, err))
+	}
+
 	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoCreateProductSuccess))
 }

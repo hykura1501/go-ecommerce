@@ -15,6 +15,17 @@ type User struct {
 	AccountId     *string `json:"account_id"`
 }
 
+type LocalLoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type RegisterRequest struct {
+	Fullname string `json:"fullname"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func (User) TableName() string {
 	return "users"
 }

@@ -228,3 +228,27 @@ func GetProductDetail(db *gorm.DB, productId int) (entity.Product, error) {
 	}
 	return product, nil
 }
+
+func CreateProduct(db *gorm.DB, product *entity.NewProductRequest) error {
+	transaction := db.Begin()
+	err := transaction.Table("product").Create(product).Error
+	if err != nil {
+		transaction.Rollback()
+		return err
+	}
+	productId := product.ProductId
+	var imageUrls []entity.ProductImage
+	for _, imageUrl := range product.ImageUrls {
+		imageUrls = append(imageUrls, entity.ProductImage{
+			ProductId: productId,
+			ImageUrl:  imageUrl,
+		})
+	}
+	err = transaction.Table("product_image").Create(&imageUrls).Error
+	if err != nil {
+		transaction.Rollback()
+		return err
+	}
+	transaction.Commit()
+	return nil
+}

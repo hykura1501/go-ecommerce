@@ -1,4 +1,4 @@
-package api
+package handler
 
 import (
 	"BE_Ecommerce/src/middlewares"

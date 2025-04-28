@@ -1,22 +1,52 @@
 package entity
 
+import "mime/multipart"
+
 type Product struct {
 	ProductId    int          `json:"product_id"`
 	ProductName  string       `json:"product_name"`
 	Price        float32      `json:"price"`
 	Stock        int          `json:"stock"`
-	Description  string       `json:"description"`
+	Description  *string      `json:"description"`
 	Category     Category     `json:"category"`
 	Manufacturer Manufacturer `json:"manufacturer"`
-	Images       StringArray  `json:"images"`
-	CreatedAt    string       `json:"created_at"`
-	UpdatedAt    string       `json:"updated_at"`
-	Discount     float32      `json:"discount"`
-	Type         string       `json:"type"`
-	Tag          string       `json:"tag"`
+	Images       *StringArray `json:"images"`
+	CreatedAt    *string      `json:"created_at"`
+	UpdatedAt    *string      `json:"updated_at"`
+	Discount     *float32     `json:"discount"`
+	Type         *string      `json:"type"`
+	Tag          *string      `json:"tag"`
 }
 
 func (p *Product) TableName() string {
+	return "product"
+}
+
+type ProductImage struct {
+	ProductId int    `json:"product_id"`
+	ImageUrl  string `json:"image_url"`
+}
+
+func (*ProductImage) TableName() string {
+	return "product_image"
+}
+
+// name, price, description, manufacturer_id, category_id, images, stock, discount, tag
+type NewProductRequest struct {
+	ProductId      int                     `gorm:"column:product_id;primaryKey;autoIncrement" json:"product_id"`
+	Name           string                  `form:"product_name" gorm:"column:product_name" validate:"required"`
+	Price          float32                 `form:"price" gorm:"column:price" validate:"required"`
+	Description    *string                 `form:"description" gorm:"column:description"`
+	ManufacturerId int                     `form:"manufacturer_id" gorm:"column:manufacturer_id" validate:"required"`
+	CategoryId     int                     `form:"category_id" gorm:"column:category_id" validate:"required"`
+	Images         []*multipart.FileHeader `form:"images" gorm:"-"`
+	ImageUrls      []string                `form:"-" gorm:"-"`
+	Stock          int                     `form:"stock" gorm:"column:stock" validate:"required"`
+	Discount       *float32                `form:"discount" gorm:"column:discount"`
+	Tag            *string                 `form:"tag" gorm:"column:tag"`
+}
+
+func (n *NewProductRequest) TableName() string {
 	return "product"
 }
 
