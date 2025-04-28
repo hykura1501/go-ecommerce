@@ -22,8 +22,15 @@ func GetCategoryById(db *gorm.DB, categoryId int) (entity.Category, error) {
 	return category, nil
 }
 
-func CreateCategory(db *gorm.DB, category *entity.NewCategoryRequest) error {
+func CreateCategory(db *gorm.DB, category *entity.CategoryRequest) error {
 	if err := db.Create(category).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateCategory(db *gorm.DB, categoryId int, category *entity.CategoryRequest) error {
+	if err := db.Model(&entity.Category{}).Where("category_id = ?", categoryId).Updates(category).Error; err != nil {
 		return err
 	}
 	return nil

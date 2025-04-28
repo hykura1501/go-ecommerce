@@ -22,7 +22,7 @@ func (c *Category) TableName() string {
 	return "category"
 }
 
-type NewCategoryRequest struct {
+type CategoryRequest struct {
 	CategoryName    string                `form:"category_name"`
 	Thumbnail       *multipart.FileHeader `form:"thumbnail" gorm:"-"`
 	ThumbnailUrl    *string               `form:"-" gorm:"column:thumbnail"`
@@ -30,7 +30,7 @@ type NewCategoryRequest struct {
 	SuperCategoryId *int                  `form:"super_category_id"`
 }
 
-func (c *NewCategoryRequest) TableName() string {
+func (c *CategoryRequest) TableName() string {
 	return "category"
 }
 

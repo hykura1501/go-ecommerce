@@ -44,6 +44,7 @@ func (server *Server) setupRouter() {
 	api.GET("/categories", server.getAllCategories)
 	api.GET("/categories/:category_id", server.getCategoryById, middlewares.Authenticate(), middlewares.IsAdmin())
 	api.POST("/categories", server.createCategory, middlewares.Authenticate(), middlewares.IsAdmin())
+	api.PUT("/categories/:category_id", server.updateCategory, middlewares.Authenticate(), middlewares.IsAdmin())
 
 	server.router = router
 }

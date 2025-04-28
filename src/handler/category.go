@@ -41,7 +41,7 @@ func (server *Server) getCategoryById(c echo.Context) error {
 }
 
 func (server *Server) createCategory(c echo.Context) error {
-	var req entity.NewCategoryRequest
+	var req entity.CategoryRequest
 	if err := c.Bind(&req); err != nil {
 		log.Println(err.Error())
 		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
@@ -60,4 +60,34 @@ func (server *Server) createCategory(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorCreateData, err))
 	}
 	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoCreateCategorySuccess))
+}
+
+func (server *Server) updateCategory(c echo.Context) error {
+
+	categoryIdStr := c.Param("category_id")
+	categoryId, err := strconv.Atoi(categoryIdStr)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
+	var req entity.CategoryRequest
+	if err := c.Bind(&req); err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
+
+	if req.Thumbnail != nil {
+		url, err := pkg.UploadSingleImage(req.Thumbnail, pkg.CategoryImageFolder)
+		if err != nil {
+			log.Println(err.Error())
+			return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorUploadImage, err))
+		}
+		req.ThumbnailUrl = url
+	}
+	err = repositories.UpdateCategory(server.dbInstance, categoryId, &req)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorUpdateData, err))
+	}
+	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoUpdateCategorySuccess))
 }
