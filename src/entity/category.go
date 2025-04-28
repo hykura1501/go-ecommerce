@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"mime/multipart"
 )
 
 type Category struct {
@@ -18,6 +19,18 @@ type Category struct {
 }
 
 func (c *Category) TableName() string {
+	return "category"
+}
+
+type NewCategoryRequest struct {
+	CategoryName    string                `form:"category_name"`
+	Thumbnail       *multipart.FileHeader `form:"thumbnail" gorm:"-"`
+	ThumbnailUrl    *string               `form:"-" gorm:"column:thumbnail"`
+	Description     *string               `form:"description"`
+	SuperCategoryId *int                  `form:"super_category_id"`
+}
+
+func (c *NewCategoryRequest) TableName() string {
 	return "category"
 }
 

@@ -13,3 +13,18 @@ func GetAllCategories(db *gorm.DB) ([]entity.Category, error) {
 	}
 	return categories, nil
 }
+
+func GetCategoryById(db *gorm.DB, categoryId int) (entity.Category, error) {
+	category := entity.Category{}
+	if err := db.Where("category_id = ?", categoryId).First(&category).Error; err != nil {
+		return category, err
+	}
+	return category, nil
+}
+
+func CreateCategory(db *gorm.DB, category *entity.NewCategoryRequest) error {
+	if err := db.Create(category).Error; err != nil {
+		return err
+	}
+	return nil
+}

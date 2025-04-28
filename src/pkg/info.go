@@ -17,6 +17,7 @@ const (
 	InfoGetStatisticByManufacturerSuccess = "get statistic by manufacturer success."
 
 	// Category
+	InfoGetCategorySuccess    = "get category success."
 	InfoGetCategoriesSuccess  = "get categories success."
 	InfoCreateCategorySuccess = "create category success."
 	InfoUpdateCategorySuccess = "update category success."
