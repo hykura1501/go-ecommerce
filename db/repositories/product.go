@@ -20,7 +20,7 @@ func GetAllProducts(db *gorm.DB, query *entity.ProductQuery) ([]entity.Product, 
 			p.description, 
 			p.discount, 
 			p.tag,
-			jsonb_build_object('category_id', c.category_id, 'category_name', c.name) AS category,
+			jsonb_build_object('category_id', c.category_id, 'category_name', c.category_name) AS category,
 			jsonb_build_object('manufacturer_id', m.manufacturer_id, 'manufacturer_name', m.manufacturer_name) AS manufacturer,
 			COALESCE(jsonb_agg(pi.image_url) FILTER (WHERE pi.image_url IS NOT NULL), '[]'::jsonb) AS images
 		FROM product p 
@@ -35,7 +35,7 @@ func GetAllProducts(db *gorm.DB, query *entity.ProductQuery) ([]entity.Product, 
 			AND (p.product_name ILIKE COALESCE(NULLIF('%%' || @search || '%%', '%%%%'), p.product_name))
 		GROUP BY 
 			p.product_id, p.product_name, p.price, p.stock, p.description, p.discount, 
-			c.category_id, c.name, 
+			c.category_id, c.category_name, 
 			m.manufacturer_id, m.manufacturer_name
 		ORDER BY %s
 		LIMIT @limit OFFSET @offset;
@@ -90,7 +90,7 @@ func GetSpecialProducts(db *gorm.DB, size int) (entity.SpecialProductList, error
 			p.description, 
 			p.discount, 
 			p.tag,
-			jsonb_build_object('category_id', c.category_id, 'category_name', c.name) AS category,
+			jsonb_build_object('category_id', c.category_id, 'category_name', c.category_name) AS category,
 			jsonb_build_object('manufacturer_id', m.manufacturer_id, 'manufacturer_name', m.manufacturer_name) AS manufacturer,
 			COALESCE(jsonb_agg(pi.image_url) FILTER (WHERE pi.image_url IS NOT NULL), '[]'::jsonb) AS images
 		FROM product p 
@@ -100,7 +100,7 @@ func GetSpecialProducts(db *gorm.DB, size int) (entity.SpecialProductList, error
 		WHERE p.tag = 'new'
 		GROUP BY 
 			p.product_id, p.product_name, p.price, p.stock, p.description, p.discount, 
-			c.category_id, c.name, 
+			c.category_id, c.category_name, 
 			m.manufacturer_id, m.manufacturer_name
 		ORDER BY p.created_at DESC
 		LIMIT $1;
@@ -124,7 +124,7 @@ func GetSpecialProducts(db *gorm.DB, size int) (entity.SpecialProductList, error
 			p.description, 
 			p.discount, 
 			p.tag,
-			jsonb_build_object('category_id', c.category_id, 'category_name', c.name) AS category,
+			jsonb_build_object('category_id', c.category_id, 'category_name', c.category_name) AS category,
 			jsonb_build_object('manufacturer_id', m.manufacturer_id, 'manufacturer_name', m.manufacturer_name) AS manufacturer,
 			COALESCE(jsonb_agg(pi.image_url) FILTER (WHERE pi.image_url IS NOT NULL), '[]'::jsonb) AS images
 		FROM product p 
@@ -134,7 +134,7 @@ func GetSpecialProducts(db *gorm.DB, size int) (entity.SpecialProductList, error
 		WHERE p.product_id IN (SELECT product_id FROM best_sellers)
 		GROUP BY 
 			p.product_id, p.product_name, p.price, p.stock, p.description, p.discount, 
-			c.category_id, c.name, 
+			c.category_id, c.category_name, 
 			m.manufacturer_id, m.manufacturer_name
 	`
 	db.Raw(bestSellerSQL, size).Scan(&results.BestSeller)
@@ -148,7 +148,7 @@ func GetSpecialProducts(db *gorm.DB, size int) (entity.SpecialProductList, error
 			p.description, 
 			p.discount, 
 			p.tag,
-			jsonb_build_object('category_id', c.category_id, 'category_name', c.name) AS category,
+			jsonb_build_object('category_id', c.category_id, 'category_name', c.category_name) AS category,
 			jsonb_build_object('manufacturer_id', m.manufacturer_id, 'manufacturer_name', m.manufacturer_name) AS manufacturer,
 			COALESCE(jsonb_agg(pi.image_url) FILTER (WHERE pi.image_url IS NOT NULL), '[]'::jsonb) AS images
 		FROM product p 
@@ -158,7 +158,7 @@ func GetSpecialProducts(db *gorm.DB, size int) (entity.SpecialProductList, error
 		WHERE p.tag = 'featured'
 		GROUP BY 
 			p.product_id, p.product_name, p.price, p.stock, p.description, p.discount, 
-			c.category_id, c.name, 
+			c.category_id, c.category_name, 
 			m.manufacturer_id, m.manufacturer_name
 		LIMIT $1;
 	`
@@ -173,7 +173,7 @@ func GetSpecialProducts(db *gorm.DB, size int) (entity.SpecialProductList, error
 			p.description, 
 			p.discount, 
 			p.tag,
-			jsonb_build_object('category_id', c.category_id, 'category_name', c.name) AS category,
+			jsonb_build_object('category_id', c.category_id, 'category_name', c.category_name) AS category,
 			jsonb_build_object('manufacturer_id', m.manufacturer_id, 'manufacturer_name', m.manufacturer_name) AS manufacturer,
 			COALESCE(jsonb_agg(pi.image_url) FILTER (WHERE pi.image_url IS NOT NULL), '[]'::jsonb) AS images
 		FROM product p 
@@ -183,7 +183,7 @@ func GetSpecialProducts(db *gorm.DB, size int) (entity.SpecialProductList, error
 		WHERE p.discount > 0
 		GROUP BY 
 			p.product_id, p.product_name, p.price, p.stock, p.description, p.discount, 
-			c.category_id, c.name, 
+			c.category_id, c.category_name, 
 			m.manufacturer_id, m.manufacturer_name
 		ORDER BY p.discount DESC
 		LIMIT $1;
@@ -204,7 +204,7 @@ func GetProductDetail(db *gorm.DB, productId int) (entity.Product, error) {
 			p.description, 
 			p.discount, 
 			p.tag,
-			jsonb_build_object('category_id', c.category_id, 'category_name', c.name) AS category,
+			jsonb_build_object('category_id', c.category_id, 'category_name', c.category_name) AS category,
 			jsonb_build_object('manufacturer_id', m.manufacturer_id, 'manufacturer_name', m.manufacturer_name) AS manufacturer,
 			COALESCE(jsonb_agg(pi.image_url) FILTER (WHERE pi.image_url IS NOT NULL), '[]'::jsonb) AS images
 		FROM product p 
@@ -214,7 +214,7 @@ func GetProductDetail(db *gorm.DB, productId int) (entity.Product, error) {
 		WHERE p.product_id = $1
 		GROUP BY 
 			p.product_id, p.product_name, p.price, p.stock, p.description, p.discount, 
-			c.category_id, c.name, 
+			c.category_id, c.category_name, 
 			m.manufacturer_id, m.manufacturer_name
 	`
 	result := db.Raw(querySQL, productId).Scan(&product)
@@ -324,11 +324,11 @@ func GetStatisticByCategory(db *gorm.DB) ([]entity.StatisticByCategory, error) {
 	querySQL := `
 		SELECT 
 			c.category_id as id, 
-			c.name AS name, 
+			c.category_name AS name, 
 			SUM(p.stock) AS quantity
 		FROM category c 
 		LEFT JOIN product p ON c.category_id = p.category_id
-		GROUP BY c.category_id, c.name;
+		GROUP BY c.category_id, c.category_name;
 		ORDER BY quantity DESC;
 	`
 	err := db.Raw(querySQL).Scan(&results).Error

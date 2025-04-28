@@ -15,4 +15,10 @@ const (
 	InfoDeleteProductSuccess              = "delete product success."
 	InfoGetStatisticByCategorySuccess     = "get statistic by category success."
 	InfoGetStatisticByManufacturerSuccess = "get statistic by manufacturer success."
+
+	// Category
+	InfoGetCategoriesSuccess  = "get categories success."
+	InfoCreateCategorySuccess = "create category success."
+	InfoUpdateCategorySuccess = "update category success."
+	InfoDeleteCategorySuccess = "delete category success."
 )

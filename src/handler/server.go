@@ -40,6 +40,9 @@ func (server *Server) setupRouter() {
 	api.GET("/statistic/category", server.getStatisticByCategory, middlewares.Authenticate(), middlewares.IsAdmin())
 	api.GET("/statistic/manufacturer", server.getStatisticByManufacturer, middlewares.Authenticate(), middlewares.IsAdmin())
 
+	// category api
+	api.GET("/categories", server.getAllCategories)
+
 	server.router = router
 }
 
