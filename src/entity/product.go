@@ -50,6 +50,20 @@ func (n *NewProductRequest) TableName() string {
 	return "product"
 }
 
+type UpdateProductRequest struct {
+	Name           *string                 `form:"product_name" gorm:"column:product_name"`
+	Price          *float32                `form:"price" gorm:"column:price"`
+	Stock          *int                    `form:"stock" gorm:"column:stock"`
+	Description    *string                 `form:"description" gorm:"column:description"`
+	ManufacturerId *int                    `form:"manufacturer_id" gorm:"column:manufacturer_id"`
+	CategoryId     *int                    `form:"category_id" gorm:"column:category_id"`
+	Discount       *float32                `form:"discount" gorm:"column:discount"`
+	Tag            *string                 `form:"tag" gorm:"column:tag"`
+	OldImageUrls   []string                `form:"old_image_urls" gorm:"-"`
+	Images         []*multipart.FileHeader `form:"images" gorm:"-"`
+	ImageUrls      []string                `form:"-" gorm:"-"`
+}
+
 type ProductQuery struct {
 	Paging
 	CategoryId int    `json:"category_id" query:"category_id"`

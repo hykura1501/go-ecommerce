@@ -252,3 +252,60 @@ func CreateProduct(db *gorm.DB, product *entity.NewProductRequest) error {
 	transaction.Commit()
 	return nil
 }
+
+func UpdateProduct(db *gorm.DB, productId int, req *entity.UpdateProductRequest) error {
+	transaction := db.Begin()
+
+	// Update product info
+	err := transaction.Table("product").Where("product_id = ?", productId).Updates(req).Error
+	if err != nil {
+		transaction.Rollback()
+		return err
+	}
+
+	// Handle uploading new images
+	if req.Images != nil {
+		urls, err := pkg.UploadMultipleImages(req.Images, pkg.ProductImageFolder)
+		if err != nil {
+			transaction.Rollback()
+			return errors.New(pkg.ErrorUploadImage)
+		}
+		req.ImageUrls = urls
+	}
+
+	// Delete old images
+	err = transaction.Where("product_id = ?", productId).Delete(&entity.ProductImage{}).Error
+	if err != nil {
+		transaction.Rollback()
+		return err
+	}
+
+	// If user kept some old images, merge them
+	if len(req.OldImageUrls) > 0 {
+		req.ImageUrls = append(req.ImageUrls, req.OldImageUrls...)
+	}
+
+	// If no images, commit and return
+	if len(req.ImageUrls) == 0 {
+		transaction.Commit()
+		return nil
+	}
+
+	// Insert new images
+	var images []entity.ProductImage
+	for _, url := range req.ImageUrls {
+		images = append(images, entity.ProductImage{
+			ProductId: productId,
+			ImageUrl:  url,
+		})
+	}
+
+	err = transaction.Create(&images).Error
+	if err != nil {
+		transaction.Rollback()
+		return err
+	}
+
+	transaction.Commit()
+	return nil
+}

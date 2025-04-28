@@ -99,3 +99,23 @@ func (server *Server) createProduct(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoCreateProductSuccess))
 }
+
+func (server *Server) updateProduct(c echo.Context) error {
+	productIdStr := c.Param("product_id")
+	productId, err := strconv.Atoi(productIdStr)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
+	var req entity.UpdateProductRequest
+	if err := c.Bind(&req); err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
+	err = repositories.UpdateProduct(server.dbInstance, productId, &req)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorUpdateData, err))
+	}
+	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoUpdateProductSuccess))
+}

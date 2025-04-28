@@ -7,6 +7,8 @@ const (
 	ErrorBindingData    = "error binding data"
 	ErrorRecordNotFound = "record not found"
 	ErrorUploadImage    = "error upload image"
+	ErrorUpdateData     = "error update data"
+	ErrorDeleteData     = "error delete data"
 	// Auth
 	ErrorUserNotExisted    = "user is not existed"
 	ErrorPasswordIncorrect = "password is incorrect"

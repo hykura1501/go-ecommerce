@@ -35,6 +35,7 @@ func (server *Server) setupRouter() {
 	api.POST("/products/create", server.createProduct, middlewares.Authenticate(), middlewares.IsAdmin())
 	api.GET("/products/detail/:product_id", server.getProductDetail)
 	api.GET("/products/special-products", server.getSpecialProducts)
+	api.PUT("/products/:product_id", server.updateProduct, middlewares.Authenticate(), middlewares.IsAdmin())
 	server.router = router
 }
 

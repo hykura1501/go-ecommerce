@@ -3,6 +3,7 @@ module BE_Ecommerce
 go 1.24.0
 
 require (
+	github.com/cloudinary/cloudinary-go/v2 v2.9.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-jwt/v4 v4.3.0
@@ -14,7 +15,6 @@ require (
 )
 
 require (
-	github.com/cloudinary/cloudinary-go/v2 v2.9.1 // indirect
 	github.com/creasty/defaults v1.7.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.5.0 // indirect
