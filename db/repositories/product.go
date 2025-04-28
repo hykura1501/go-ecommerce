@@ -309,3 +309,52 @@ func UpdateProduct(db *gorm.DB, productId int, req *entity.UpdateProductRequest)
 	transaction.Commit()
 	return nil
 }
+
+func DeleteProduct(db *gorm.DB, productId int) error {
+	// Delete product
+	err := db.Where("product_id = ?", productId).Delete(&entity.Product{}).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetStatisticByCategory(db *gorm.DB) ([]entity.StatisticByCategory, error) {
+	results := []entity.StatisticByCategory{}
+	querySQL := `
+		SELECT 
+			c.category_id as id, 
+			c.name AS name, 
+			SUM(p.stock) AS quantity
+		FROM category c 
+		LEFT JOIN product p ON c.category_id = p.category_id
+		GROUP BY c.category_id, c.name;
+		ORDER BY quantity DESC;
+	`
+	err := db.Raw(querySQL).Scan(&results).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+func GetStatisticByManufacturer(db *gorm.DB) ([]entity.StatisticByManufacturer, error) {
+	results := []entity.StatisticByManufacturer{}
+	querySQL := `
+		SELECT 
+			m.manufacturer_id as id, 
+			m.manufacturer_name AS name, 
+			SUM(p.stock) AS quantity
+		FROM manufacturer m 
+		LEFT JOIN product p ON m.manufacturer_id = p.manufacturer_id
+		GROUP BY m.manufacturer_id, m.manufacturer_name;
+		ORDER BY quantity DESC;
+	`
+	err := db.Raw(querySQL).Scan(&results).Error
+	if err != nil {
+		return nil, nil
+	}
+	return results, nil
+}

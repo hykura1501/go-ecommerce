@@ -119,3 +119,36 @@ func (server *Server) updateProduct(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoUpdateProductSuccess))
 }
+
+func (server *Server) deleteProduct(c echo.Context) error {
+	productIdStr := c.Param("product_id")
+	productId, err := strconv.Atoi(productIdStr)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
+	err = repositories.DeleteProduct(server.dbInstance, productId)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorDeleteData, err))
+	}
+	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoDeleteProductSuccess))
+}
+
+func (server *Server) getStatisticByCategory(c echo.Context) error {
+	results, err := repositories.GetStatisticByCategory(server.dbInstance)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetData, err))
+	}
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetStatisticByCategorySuccess, results))
+}
+
+func (server *Server) getStatisticByManufacturer(c echo.Context) error {
+	results, err := repositories.GetStatisticByManufacturer(server.dbInstance)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetData, err))
+	}
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetStatisticByManufacturerSuccess, results))
+}
