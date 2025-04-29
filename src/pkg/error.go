@@ -9,6 +9,7 @@ const (
 	ErrorUploadImage    = "error upload image"
 	ErrorUpdateData     = "error update data"
 	ErrorDeleteData     = "error delete data"
+	ErrorLoginProvider  = "error login provider"
 	// Auth
 	ErrorUserNotExisted    = "user is not existed"
 	ErrorPasswordIncorrect = "password is incorrect"

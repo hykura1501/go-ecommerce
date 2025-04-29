@@ -27,8 +27,8 @@ func (server *Server) setupRouter() {
 	// auth api
 	api.POST("/auth/login/local", server.localLogin)
 	api.POST("/users", server.register) // Register
-	api.GET("/auth/login/google", server.googleLogin)
-	api.GET("/auth/login/google/callback", server.googleLoginCallback)
+	api.GET("/auth/login/:provider", server.providerLogin)
+	api.GET("/auth/login/:provider/callback", server.providerLoginCallback)
 
 	// product api
 	api.GET("/products", server.getAllProducts)

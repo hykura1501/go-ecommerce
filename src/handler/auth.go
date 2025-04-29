@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 
+	"cloud.google.com/go/auth/credentials/idtoken"
 	"github.com/labstack/echo/v4"
 	"github.com/markbates/goth/gothic"
 )
@@ -74,14 +75,27 @@ func (server *Server) register(c echo.Context) error {
 	}))
 }
 
-func (server *Server) googleLogin(c echo.Context) error {
+func (server *Server) providerLogin(c echo.Context) error {
 	req := c.Request()
 	res := c.Response()
-	req = req.WithContext(context.WithValue(req.Context(), "provider", "google"))
+	provider := c.Param("provider")
+	req = req.WithContext(context.WithValue(req.Context(), pkg.PROVIDER, provider))
 	gothic.BeginAuthHandler(res, req)
 	return nil
 }
 
-func (server *Server) googleLoginCallback(c echo.Context) error {
-	return c.Redirect(http.StatusOK, os.Getenv("CLIENT_URL"))
+func (server *Server) providerLoginCallback(c echo.Context) error {
+	req := c.Request()
+	res := c.Response()
+	provider := c.Param("provider")
+	req = req.WithContext(context.WithValue(req.Context(), pkg.PROVIDER, provider))
+	user, err := gothic.CompleteUserAuth(res, req)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorLoginProvider, err))
+	}
+	payload, err := idtoken.Validate(context.Background(), user.IDToken, os.Getenv("GOOGLE_CLIENT_ID"))
+	if err != nil {
+		panic(err)
+	}
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoLoginSuccess, payload.Claims))
 }

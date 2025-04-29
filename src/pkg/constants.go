@@ -7,3 +7,5 @@ const (
 
 const ProductImageFolder = "product_images"
 const CategoryImageFolder = "category_images"
+
+const PROVIDER = "provider"
