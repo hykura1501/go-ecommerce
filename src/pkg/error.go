@@ -19,4 +19,5 @@ const (
 	ErrorInvalidIdToken    = "invalid id token"
 	ErrorCreateUser        = "error create user"
 	ErrorExchangeToken     = "error exchange token"
+	ErrorGetUserInfo       = "error get user info"
 )

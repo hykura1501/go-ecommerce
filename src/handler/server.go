@@ -28,6 +28,7 @@ func (server *Server) setupRouter() {
 	api.POST("/auth/login/local", server.loginLocal)
 	api.POST("/users", server.register) // Register
 	api.POST("/auth/login/google", server.loginGoogle)
+	api.POST("/auth/login/facebook", server.loginFacebook)
 
 	// product api
 	api.GET("/products", server.getAllProducts)

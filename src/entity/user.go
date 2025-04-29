@@ -30,6 +30,23 @@ type LoginGoogleRequest struct {
 	Code string `json:"code"`
 }
 
+type LoginFacebookRequest struct {
+	AccessToken string `json:"access_token"`
+}
+
+type FacebookUser struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Email   string `json:"email"`
+	Picture struct {
+		Data struct {
+			URL    string `json:"url"`
+			Width  int    `json:"width"`
+			Height int    `json:"height"`
+		} `json:"data"`
+	} `json:"picture"`
+}
+
 func (User) TableName() string {
 	return "users"
 }

@@ -5,6 +5,8 @@ import (
 	"BE_Ecommerce/src/config"
 	"BE_Ecommerce/src/entity"
 	"BE_Ecommerce/src/pkg"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -110,6 +112,62 @@ func (server *Server) loginGoogle(c echo.Context) error {
 			ProviderId:    &providerId,
 			Fullname:      &fullname,
 			Avatar:        &avatar,
+			Permission:    0,
+		}
+		err := repositories.CreateUserByProvider(server.dbInstance, user)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorCreateUser, err))
+		}
+
+		// Generate token
+		token, err := pkg.GenerateToken(user.UserId, user.Permission)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorGenerateToken, err))
+		}
+		return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoLoginSuccess, echo.Map{
+			"token": token,
+		}))
+	}
+	// Generate token
+	token, err := pkg.GenerateToken(existedUser.UserId, existedUser.Permission)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorGenerateToken, err))
+	}
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoLoginSuccess, echo.Map{
+		"token": token,
+	}))
+}
+
+func (server *Server) loginFacebook(c echo.Context) error {
+	var req entity.LoginFacebookRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
+	userInfoURL := fmt.Sprintf("https://graph.facebook.com/me?fields=id,name,email,picture.width(400).height(400)&access_token=%s", req.AccessToken)
+
+	res, err := http.Get(userInfoURL)
+	if err != nil || res.StatusCode != 200 {
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetUserInfo, err))
+	}
+
+	defer res.Body.Close()
+	var fbUser entity.FacebookUser
+	json.NewDecoder(res.Body).Decode(&fbUser)
+
+	config := config.LoadEnv()
+	loginProvider := config.ProviderFacebook
+	providerId := fbUser.ID
+
+	// check existed user
+	existedUser, err := repositories.GetUserByProvider(server.dbInstance, loginProvider, providerId)
+	if err != nil {
+		// not existed user, create new user
+		user := &entity.User{
+			LoginProvider: &loginProvider,
+			ProviderId:    &providerId,
+			Fullname:      &fbUser.Name,
+			Avatar:        &fbUser.Picture.Data.URL,
 			Permission:    0,
 		}
 		err := repositories.CreateUserByProvider(server.dbInstance, user)
