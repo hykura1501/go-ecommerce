@@ -89,3 +89,19 @@ func ResetPassword(dbInstance *gorm.DB, userId int, newPassword string) error {
 	}
 	return nil
 }
+
+func UpdateUser(dbInstance *gorm.DB, userId int, user *entity.UpdateUserRequest) error {
+	err := dbInstance.Model(&entity.User{}).Where("user_id = ?", userId).Updates(user).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteUser(dbInstance *gorm.DB, userId int) error {
+	err := dbInstance.Delete(&entity.User{}, userId).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

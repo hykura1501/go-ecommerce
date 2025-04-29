@@ -55,6 +55,8 @@ func (server *Server) setupRouter() {
 	api.GET("/users/:user_id", server.getUserById, middlewares.Authenticate(), middlewares.IsAdmin())
 	api.GET("/users/statistics/new-users", server.getNewUsersStatistics, middlewares.Authenticate(), middlewares.IsAdmin())
 	api.PUT("/users/reset-password", server.resetPassword, middlewares.Authenticate())
+	api.PUT("/users", server.updateUser, middlewares.Authenticate())
+	api.DELETE("/users/:user_id", server.deleteUser, middlewares.Authenticate(), middlewares.IsAdmin())
 	server.router = router
 }
 

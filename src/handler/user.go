@@ -115,3 +115,45 @@ func (server *Server) resetPassword(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoResetPasswordSuccess))
 }
+
+func (server *Server) updateUser(c echo.Context) error {
+	tokenUser := c.Get("user").(*jwt.Token)
+	userId := tokenUser.Claims.(*pkg.JwtCustomClaims).UserID
+	var updateUserRequest entity.UpdateUserRequest
+	if err := c.Bind(&updateUserRequest); err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
+
+	if updateUserRequest.Avatar != nil {
+		avatar, err := pkg.UploadSingleImage(updateUserRequest.Avatar, pkg.AvatarFolder)
+		if err != nil {
+			log.Println(err.Error())
+			return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorUploadImage, err))
+		}
+		updateUserRequest.AvatarUrl = avatar
+	}
+
+	err := repositories.UpdateUser(server.dbInstance, userId, &updateUserRequest)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorUpdateData, err))
+	}
+
+	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoUpdateUserSuccess))
+}
+
+func (server *Server) deleteUser(c echo.Context) error {
+	userIdStr := c.Param("user_id")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
+	err = repositories.DeleteUser(server.dbInstance, userId)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorDeleteData, err))
+	}
+	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoDeleteUserSuccess))
+}

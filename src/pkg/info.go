@@ -30,4 +30,6 @@ const (
 	InfoGetUserMeSuccess             = "get user me success."
 	InfoGetNewUsersStatisticsSuccess = "get new users statistics success."
 	InfoResetPasswordSuccess         = "reset password success."
+	InfoUpdateUserSuccess            = "update user success."
+	InfoDeleteUserSuccess            = "delete user success."
 )

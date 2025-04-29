@@ -1,5 +1,7 @@
 package entity
 
+import "mime/multipart"
+
 type User struct {
 	UserId        int     `json:"user_id" gorm:"primaryKey"`
 	Username      *string `json:"username" gorm:"unique;not null"`
@@ -54,6 +56,14 @@ type FacebookUser struct {
 
 type ResetPasswordRequest struct {
 	NewPassword string `json:"new_password"`
+}
+
+type UpdateUserRequest struct {
+	Fullname  *string               `form:"fullname"`
+	Phone     *string               `form:"phone"`
+	Address   *string               `form:"address"`
+	Avatar    *multipart.FileHeader `form:"avatar" gorm:"-"`
+	AvatarUrl *string               `gorm:"column:avatar"`
 }
 
 func (User) TableName() string {
