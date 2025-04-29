@@ -6,6 +6,7 @@ import (
 	"BE_Ecommerce/src/entity"
 	"BE_Ecommerce/src/pkg"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -31,7 +32,7 @@ func (server *Server) loginLocal(c echo.Context) error {
 	isValidPassword := pkg.ComparePasswords(*user.Password, []byte(req.Password))
 
 	if !isValidPassword {
-		return c.JSON(http.StatusNotFound, pkg.ResponseError(pkg.ErrorPasswordIncorrect, err))
+		return c.JSON(http.StatusNotFound, pkg.ResponseError(pkg.ErrorPasswordIncorrect, errors.New(pkg.ErrorPasswordIncorrect)))
 	}
 
 	// return token

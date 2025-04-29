@@ -37,7 +37,9 @@ func (server *Server) getCategoryById(c echo.Context) error {
 		log.Println(err.Error())
 		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetData, err))
 	}
-	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetCategorySuccess, category))
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetCategorySuccess, echo.Map{
+		"category": category,
+	}))
 }
 
 func (server *Server) createCategory(c echo.Context) error {

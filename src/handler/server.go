@@ -26,7 +26,8 @@ func (server *Server) setupRouter() {
 	api := router.Group("/api")
 	// auth api
 	api.POST("/auth/login/local", server.loginLocal)
-	api.POST("/users", server.register) // Register
+	api.POST("/auth/register", server.register)
+	// api.POST("/auth/login/refresh", server.loginRefresh)
 	api.POST("/auth/login/google", server.loginGoogle)
 	api.POST("/auth/login/facebook", server.loginFacebook)
 
@@ -47,6 +48,13 @@ func (server *Server) setupRouter() {
 	api.PUT("/categories/:category_id", server.updateCategory, middlewares.Authenticate(), middlewares.IsAdmin())
 	api.DELETE("/categories/:category_id", server.deleteCategory, middlewares.Authenticate(), middlewares.IsAdmin())
 	api.GET("/categories/products/:id", server.getProductsByCategoryId)
+
+	// user api
+	api.GET("/users", server.getAllUsers, middlewares.Authenticate(), middlewares.IsAdmin())
+	api.GET("/users/me", server.getUserMe, middlewares.Authenticate())
+	api.GET("/users/:user_id", server.getUserById, middlewares.Authenticate(), middlewares.IsAdmin())
+	api.GET("/users/statistics/new-users", server.getNewUsersStatistics, middlewares.Authenticate(), middlewares.IsAdmin())
+	api.PUT("/users/reset-password", server.resetPassword, middlewares.Authenticate())
 	server.router = router
 }
 

@@ -15,6 +15,11 @@ type User struct {
 	AccountId     *string `json:"account_id"`
 }
 
+type UserQuery struct {
+	Paging
+	Search string `json:"search" query:"search"`
+}
+
 type LoginLocalRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -45,6 +50,10 @@ type FacebookUser struct {
 			Height int    `json:"height"`
 		} `json:"data"`
 	} `json:"picture"`
+}
+
+type ResetPasswordRequest struct {
+	NewPassword string `json:"new_password"`
 }
 
 func (User) TableName() string {

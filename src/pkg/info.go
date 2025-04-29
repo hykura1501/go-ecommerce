@@ -23,4 +23,11 @@ const (
 	InfoUpdateCategorySuccess          = "update category success."
 	InfoDeleteCategorySuccess          = "delete category success."
 	InfoGetProductsByCategoryIdSuccess = "get products by category id success."
+
+	// User
+	InfoGetAllUsersSuccess           = "get all users success."
+	InfoGetUserByIdSuccess           = "get user by id success."
+	InfoGetUserMeSuccess             = "get user me success."
+	InfoGetNewUsersStatisticsSuccess = "get new users statistics success."
+	InfoResetPasswordSuccess         = "reset password success."
 )

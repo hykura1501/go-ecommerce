@@ -56,7 +56,9 @@ func (server *Server) getProductDetail(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetData, err))
 	}
 
-	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetProductDetailSuccess, product))
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetProductDetailSuccess, echo.Map{
+		"product": product,
+	}))
 }
 
 func (server *Server) getSpecialProducts(c echo.Context) error {
@@ -72,7 +74,9 @@ func (server *Server) getSpecialProducts(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetData, err))
 	}
 
-	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetSpecialProductsSuccess, results))
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetSpecialProductsSuccess, echo.Map{
+		"products": results,
+	}))
 }
 
 func (server *Server) createProduct(c echo.Context) error {
@@ -141,7 +145,9 @@ func (server *Server) getStatisticByCategory(c echo.Context) error {
 		log.Println(err.Error())
 		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetData, err))
 	}
-	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetStatisticByCategorySuccess, results))
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetStatisticByCategorySuccess, echo.Map{
+		"statistics": results,
+	}))
 }
 
 func (server *Server) getStatisticByManufacturer(c echo.Context) error {
@@ -150,5 +156,7 @@ func (server *Server) getStatisticByManufacturer(c echo.Context) error {
 		log.Println(err.Error())
 		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorGetData, err))
 	}
-	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetStatisticByManufacturerSuccess, results))
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoGetStatisticByManufacturerSuccess, echo.Map{
+		"statistics": results,
+	}))
 }
