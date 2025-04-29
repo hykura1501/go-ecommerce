@@ -1,6 +1,9 @@
 package config
 
-import "os"
+import (
+	"os"
+	"strconv"
+)
 
 type Env struct {
 	//  DB
@@ -25,6 +28,11 @@ type Env struct {
 	CloudName      string
 	CloudApiKey    string
 	CloudApiSecret string
+
+	//Provider
+	ProviderLocal    int
+	ProviderGoogle   int
+	ProviderFacebook int
 }
 
 var env *Env
@@ -33,6 +41,15 @@ func LoadEnv() *Env {
 	if env != nil {
 		return env
 	}
+
+	providerLocal := os.Getenv("PROVIDER_LOCAL")
+	providerGoogle := os.Getenv("PROVIDER_GOOGLE")
+	providerFacebook := os.Getenv("PROVIDER_FACEBOOK")
+
+	// parse to int
+	providerLocalInt, _ := strconv.Atoi(providerLocal)
+	providerGoogleInt, _ := strconv.Atoi(providerGoogle)
+	providerFacebookInt, _ := strconv.Atoi(providerFacebook)
 
 	env = &Env{
 		DBHost:             os.Getenv("DB_HOST"),
@@ -48,6 +65,9 @@ func LoadEnv() *Env {
 		CloudName:          os.Getenv("CLOUDINARY_CLOUD_NAME"),
 		CloudApiKey:        os.Getenv("CLOUDINARY_API_KEY"),
 		CloudApiSecret:     os.Getenv("CLOUDINARY_API_SECRET"),
+		ProviderLocal:      providerLocalInt,
+		ProviderGoogle:     providerGoogleInt,
+		ProviderFacebook:   providerFacebookInt,
 	}
 
 	return env

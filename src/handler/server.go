@@ -25,10 +25,9 @@ func (server *Server) setupRouter() {
 	router := echo.New()
 	api := router.Group("/api")
 	// auth api
-	api.POST("/auth/login/local", server.localLogin)
+	api.POST("/auth/login/local", server.loginLocal)
 	api.POST("/users", server.register) // Register
-	api.GET("/auth/login/:provider", server.providerLogin)
-	api.GET("/auth/login/:provider/callback", server.providerLoginCallback)
+	api.POST("/auth/login/google", server.loginGoogle)
 
 	// product api
 	api.GET("/products", server.getAllProducts)

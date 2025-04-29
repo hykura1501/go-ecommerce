@@ -2,20 +2,20 @@ package handler
 
 import (
 	"BE_Ecommerce/db/repositories"
+	"BE_Ecommerce/src/config"
 	"BE_Ecommerce/src/entity"
 	"BE_Ecommerce/src/pkg"
-	"context"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
 
 	"cloud.google.com/go/auth/credentials/idtoken"
 	"github.com/labstack/echo/v4"
-	"github.com/markbates/goth/gothic"
 )
 
-func (server *Server) localLogin(c echo.Context) error {
-	var req entity.LocalLoginRequest
+func (server *Server) loginLocal(c echo.Context) error {
+	var req entity.LoginLocalRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
 	}
@@ -75,27 +75,64 @@ func (server *Server) register(c echo.Context) error {
 	}))
 }
 
-func (server *Server) providerLogin(c echo.Context) error {
-	req := c.Request()
-	res := c.Response()
-	provider := c.Param("provider")
-	req = req.WithContext(context.WithValue(req.Context(), pkg.PROVIDER, provider))
-	gothic.BeginAuthHandler(res, req)
-	return nil
-}
+func (server *Server) loginGoogle(c echo.Context) error {
+	var req entity.LoginGoogleRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
 
-func (server *Server) providerLoginCallback(c echo.Context) error {
-	req := c.Request()
-	res := c.Response()
-	provider := c.Param("provider")
-	req = req.WithContext(context.WithValue(req.Context(), pkg.PROVIDER, provider))
-	user, err := gothic.CompleteUserAuth(res, req)
+	googleOAuthClient := pkg.NewGoogleOAuthClient()
+
+	tokenByCode, err := googleOAuthClient.Exchange(c.Request().Context(), req.Code)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorLoginProvider, err))
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorExchangeToken, err))
 	}
-	payload, err := idtoken.Validate(context.Background(), user.IDToken, os.Getenv("GOOGLE_CLIENT_ID"))
+	idToken := tokenByCode.Extra("id_token").(string)
+
+	config := config.LoadEnv()
+
+	payload, err := idtoken.Validate(c.Request().Context(), idToken, config.GoogleClientID)
 	if err != nil {
-		panic(err)
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorInvalidIdToken, err))
 	}
-	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoLoginSuccess, payload.Claims))
+	loginProvider := config.ProviderGoogle
+	providerId := payload.Claims["sub"].(string)
+
+	// check existed user
+	existedUser, err := repositories.GetUserByProvider(server.dbInstance, loginProvider, providerId)
+	if err != nil {
+		// not existed user, create new user
+		fullname := payload.Claims["name"].(string)
+		avatar := payload.Claims["picture"].(string)
+		user := &entity.User{
+			LoginProvider: &loginProvider,
+			ProviderId:    &providerId,
+			Fullname:      &fullname,
+			Avatar:        &avatar,
+			Permission:    0,
+		}
+		err := repositories.CreateUserByProvider(server.dbInstance, user)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorCreateUser, err))
+		}
+
+		// Generate token
+		token, err := pkg.GenerateToken(user.UserId, user.Permission)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorGenerateToken, err))
+		}
+		return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoLoginSuccess, echo.Map{
+			"token": token,
+		}))
+	}
+	// Generate token
+	token, err := pkg.GenerateToken(existedUser.UserId, existedUser.Permission)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorGenerateToken, err))
+	}
+	return c.JSON(http.StatusOK, pkg.ResponseSuccessWithData(pkg.InfoLoginSuccess, echo.Map{
+		"token": token,
+	}))
 }

@@ -16,4 +16,7 @@ const (
 	ErrorGenerateToken     = "error generate token"
 	ErrorUserExisted       = "user is existed"
 	ErrorForbidden         = "forbidden"
+	ErrorInvalidIdToken    = "invalid id token"
+	ErrorCreateUser        = "error create user"
+	ErrorExchangeToken     = "error exchange token"
 )
