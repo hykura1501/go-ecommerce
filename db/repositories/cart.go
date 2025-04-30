@@ -106,3 +106,19 @@ func AddItemsToCart(dbInstance *gorm.DB, userId int, items []entity.CartItem) er
 	}
 	return nil
 }
+
+func DeleteCartItem(dbInstance *gorm.DB, userId int, productId int) error {
+	query := `
+		DELETE FROM carts
+		WHERE user_id = @userId AND product_id = @productId
+	`
+	err := dbInstance.Exec(query, map[string]interface{}{
+		"userId":    userId,
+		"productId": productId,
+	}).Error
+
+	if err != nil {
+		return err
+	}
+	return nil
+}

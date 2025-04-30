@@ -90,3 +90,21 @@ func (server *Server) addItemsToCart(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoAddToCartSuccess))
 }
+
+func (server *Server) deleteCartItem(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token).Claims.(*pkg.JwtCustomClaims)
+	productIdStr := c.Param("product_id")
+	productId, err := strconv.Atoi(productIdStr)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusBadRequest, pkg.ResponseError(pkg.ErrorBindingData, err))
+	}
+
+	err = repositories.DeleteCartItem(server.dbInstance, user.UserID, productId)
+	if err != nil {
+		log.Println(err.Error())
+		return c.JSON(http.StatusInternalServerError, pkg.ResponseError(pkg.ErrorDeleteCartItem, err))
+	}
+
+	return c.JSON(http.StatusOK, pkg.ResponseSuccess(pkg.InfoDeleteCartItemSuccess))
+}

@@ -63,6 +63,7 @@ func (server *Server) setupRouter() {
 	api.POST("/carts", server.addToCart, middlewares.Authenticate())
 	api.PUT("/carts/:product_id", server.updateCart, middlewares.Authenticate())
 	api.POST("/carts/items", server.addItemsToCart, middlewares.Authenticate())
+	api.DELETE("/carts/:product_id", server.deleteCartItem, middlewares.Authenticate())
 	server.router = router
 }
 

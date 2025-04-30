@@ -34,7 +34,8 @@ const (
 	InfoDeleteUserSuccess            = "delete user success."
 
 	// Cart
-	InfoGetCartSuccess    = "get cart success."
-	InfoAddToCartSuccess  = "add to cart success."
-	InfoUpdateCartSuccess = "update cart success."
+	InfoGetCartSuccess        = "get cart success."
+	InfoAddToCartSuccess      = "add to cart success."
+	InfoUpdateCartSuccess     = "update cart success."
+	InfoDeleteCartItemSuccess = "delete cart item success."
 )
