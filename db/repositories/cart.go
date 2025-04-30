@@ -66,3 +66,43 @@ func AddToCart(dbInstance *gorm.DB, userId int, productId int) error {
 	}
 	return nil
 }
+
+func UpdateCart(dbInstance *gorm.DB, userId int, productId int, quantity int) error {
+	query := `
+		UPDATE carts
+		SET quantity = @quantity
+		WHERE user_id = @userId AND product_id = @productId
+	`
+	err := dbInstance.Exec(query, map[string]interface{}{
+		"userId":    userId,
+		"productId": productId,
+		"quantity":  quantity,
+	}).Error
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func AddItemsToCart(dbInstance *gorm.DB, userId int, items []entity.CartItem) error {
+	query := `
+		INSERT INTO carts (user_id, product_id, quantity)
+		VALUES (@userId, @productId, @quantity)
+		ON CONFLICT (user_id, product_id) DO UPDATE
+		SET quantity = carts.quantity + @quantity
+	`
+
+	for _, item := range items {
+		err := dbInstance.Exec(query, map[string]interface{}{
+			"userId":    userId,
+			"productId": item.ProductId,
+			"quantity":  item.Quantity,
+		}).Error
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

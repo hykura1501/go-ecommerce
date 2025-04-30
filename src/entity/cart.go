@@ -24,6 +24,19 @@ type AddToCartRequest struct {
 	ProductId int `json:"product_id"`
 }
 
+type UpdateCartRequest struct {
+	Quantity int `json:"quantity"`
+}
+
+type CartItem struct {
+	ProductId int `json:"product_id"`
+	Quantity  int `json:"quantity"`
+}
+
+type AddItemsToCartRequest struct {
+	Items []CartItem `json:"items"`
+}
+
 // implement Scanner
 func (c *ProductCart) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)

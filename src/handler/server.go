@@ -61,6 +61,8 @@ func (server *Server) setupRouter() {
 	// cart API
 	api.GET("/carts", server.getCart, middlewares.Authenticate())
 	api.POST("/carts", server.addToCart, middlewares.Authenticate())
+	api.PUT("/carts/:product_id", server.updateCart, middlewares.Authenticate())
+	api.POST("/carts/items", server.addItemsToCart, middlewares.Authenticate())
 	server.router = router
 }
 

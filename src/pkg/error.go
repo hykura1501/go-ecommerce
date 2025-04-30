@@ -27,5 +27,6 @@ const (
 	ErrorUserNotFound = "user not found"
 
 	//Cart
-	ErrorAddToCart = "error add to cart"
+	ErrorAddToCart  = "error add to cart"
+	ErrorUpdateCart = "error update cart"
 )
