@@ -1,21 +1,26 @@
 package entity
 
-import "mime/multipart"
+import (
+	"database/sql/driver"
+	"encoding/json"
+	"fmt"
+	"mime/multipart"
+)
 
 type Product struct {
-	ProductId    int          `json:"product_id"`
-	ProductName  string       `json:"product_name"`
-	Price        float32      `json:"price"`
-	Stock        int          `json:"stock"`
-	Description  *string      `json:"description"`
-	Category     Category     `json:"category"`
-	Manufacturer Manufacturer `json:"manufacturer"`
-	Images       *StringArray `json:"images"`
-	CreatedAt    *string      `json:"created_at"`
-	UpdatedAt    *string      `json:"updated_at"`
-	Discount     *float32     `json:"discount"`
-	Type         *string      `json:"type"`
-	Tag          *string      `json:"tag"`
+	ProductId    int          `json:"product_id,omitempty"`
+	ProductName  string       `json:"product_name,omitempty"`
+	Price        float32      `json:"price,omitempty"`
+	Stock        int          `json:"stock,omitempty"`
+	Description  *string      `json:"description,omitempty"`
+	Category     Category     `json:"category,omitempty"`
+	Manufacturer Manufacturer `json:"manufacturer,omitempty"`
+	Images       *StringArray `json:"images,omitempty"`
+	CreatedAt    *string      `json:"created_at,omitempty"`
+	UpdatedAt    *string      `json:"updated_at,omitempty"`
+	Discount     *float32     `json:"discount,omitempty"`
+	Type         *string      `json:"type,omitempty"`
+	Tag          *string      `json:"tag,omitempty"`
 }
 
 func (p *Product) TableName() string {
@@ -91,4 +96,18 @@ var SortProductsOptions = map[string]string{
 	"created_at_desc":   "p.created_at desc",
 	"product_name_asc":  "p.product_name asc",
 	"product_name_desc": "p.product_name desc",
+}
+
+// implement Scanner
+func (c *Product) Scan(value interface{}) error {
+	bytes, ok := value.([]byte)
+	if !ok {
+		return fmt.Errorf("failed to unmarshal Product value: %v", value)
+	}
+	return json.Unmarshal(bytes, c)
+}
+
+// implement Valuer
+func (c Product) Value() (driver.Value, error) {
+	return json.Marshal(c)
 }

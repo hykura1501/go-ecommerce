@@ -11,6 +11,7 @@ const (
 	ErrorDeleteData            = "error delete data"
 	ErrorLoginProvider         = "error login provider"
 	ErrorResetPasswordNotLocal = "reset password not local"
+
 	// Auth
 	ErrorUserNotExisted    = "user is not existed"
 	ErrorPasswordIncorrect = "password is incorrect"
@@ -21,6 +22,10 @@ const (
 	ErrorCreateUser        = "error create user"
 	ErrorExchangeToken     = "error exchange token"
 	ErrorGetUserInfo       = "error get user info"
+
 	// User
 	ErrorUserNotFound = "user not found"
+
+	//Cart
+	ErrorAddToCart = "error add to cart"
 )

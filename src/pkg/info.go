@@ -32,4 +32,8 @@ const (
 	InfoResetPasswordSuccess         = "reset password success."
 	InfoUpdateUserSuccess            = "update user success."
 	InfoDeleteUserSuccess            = "delete user success."
+
+	// Cart
+	InfoGetCartSuccess   = "get cart success."
+	InfoAddToCartSuccess = "add to cart success."
 )
