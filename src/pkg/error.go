@@ -30,4 +30,16 @@ const (
 	ErrorAddToCart      = "error add to cart"
 	ErrorUpdateCart     = "error update cart"
 	ErrorDeleteCartItem = "error delete cart item"
+
+	//Order
+	ErrorCreateOrder               = "error create order"
+	ErrorInsufficientStock         = "insufficient stock"
+	ErrorInsertOrderDetail         = "error insert order detail"
+	ErrorUpdateProductStock        = "error update product stock"
+	ErrorGetOrderHistory           = "error get order history"
+	ErrorGetOrders                 = "error get orders"
+	ErrorGetRevenueStatistics      = "error get revenue statistics"
+	ErrorGetBestSellersStatistics  = "error get best sellers statistics"
+	ErrorGetTopCustomersStatistics = "error get top customers statistics"
+	ErrorGetOrderDetail            = "error get order detail"
 )

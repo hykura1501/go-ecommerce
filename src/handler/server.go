@@ -64,6 +64,16 @@ func (server *Server) setupRouter() {
 	api.PUT("/carts/:product_id", server.updateCart, middlewares.Authenticate())
 	api.POST("/carts/items", server.addItemsToCart, middlewares.Authenticate())
 	api.DELETE("/carts/:product_id", server.deleteCartItem, middlewares.Authenticate())
+
+	// order API
+	api.POST("/orders", server.createOrder, middlewares.Authenticate())
+	api.GET("/orders/history", server.getOrderHistoryOfUser, middlewares.Authenticate())
+	api.GET("/orders/history/:user_id", server.getOrderHistoryOfUser, middlewares.Authenticate(), middlewares.IsAdmin())
+	api.GET("/orders", server.getOrders, middlewares.Authenticate(), middlewares.IsAdmin())
+	api.GET("/orders/statistics/revenue", server.getRevenueStatistics, middlewares.Authenticate(), middlewares.IsAdmin())
+	api.GET("/orders/statistics/best-sellers", server.getBestSellersStatistics, middlewares.Authenticate(), middlewares.IsAdmin())
+	api.GET("/orders/statistics/top-customers", server.getTopCustomersStatistics, middlewares.Authenticate(), middlewares.IsAdmin())
+	api.GET("/orders/detail/:id", server.getOrderDetail, middlewares.Authenticate())
 	server.router = router
 }
 

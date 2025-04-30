@@ -38,4 +38,13 @@ const (
 	InfoAddToCartSuccess      = "add to cart success."
 	InfoUpdateCartSuccess     = "update cart success."
 	InfoDeleteCartItemSuccess = "delete cart item success."
+
+	// Order
+	InfoCreateOrderSuccess               = "create order success."
+	InfoGetOrderHistorySuccess           = "get order history success."
+	InfoGetOrdersSuccess                 = "get orders success."
+	InfoGetRevenueStatisticsSuccess      = "get revenue statistics success."
+	InfoGetBestSellersStatisticsSuccess  = "get best sellers statistics success."
+	InfoGetTopCustomersStatisticsSuccess = "get top customers statistics success."
+	InfoGetOrderDetailSuccess            = "get order detail success."
 )
