@@ -2,8 +2,10 @@ package handler
 
 import (
 	"BE_Ecommerce/src/middlewares"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
 )
 
@@ -23,6 +25,11 @@ func NewServer(dbInstance *gorm.DB) (*Server, error) {
 
 func (server *Server) setupRouter() {
 	router := echo.New()
+	router.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"http://localhost:*", "http://localhost:5173"},
+		AllowMethods:     []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+		AllowCredentials: true,
+	}))
 	api := router.Group("/api")
 	// auth api
 	api.POST("/auth/login/local", server.loginLocal)
@@ -38,8 +45,8 @@ func (server *Server) setupRouter() {
 	api.GET("/products/special-products", server.getSpecialProducts)
 	api.PUT("/products/:product_id", server.updateProduct, middlewares.Authenticate(), middlewares.IsAdmin())
 	api.DELETE("/products/:product_id", server.deleteProduct, middlewares.Authenticate(), middlewares.IsAdmin())
-	api.GET("/statistic/category", server.getStatisticByCategory, middlewares.Authenticate(), middlewares.IsAdmin())
-	api.GET("/statistic/manufacturer", server.getStatisticByManufacturer, middlewares.Authenticate(), middlewares.IsAdmin())
+	api.GET("/products/statistic/category", server.getStatisticByCategory, middlewares.Authenticate(), middlewares.IsAdmin())
+	api.GET("/products/statistic/manufacturer", server.getStatisticByManufacturer, middlewares.Authenticate(), middlewares.IsAdmin())
 
 	// category api
 	api.GET("/categories", server.getAllCategories)
@@ -48,6 +55,9 @@ func (server *Server) setupRouter() {
 	api.PUT("/categories/:category_id", server.updateCategory, middlewares.Authenticate(), middlewares.IsAdmin())
 	api.DELETE("/categories/:category_id", server.deleteCategory, middlewares.Authenticate(), middlewares.IsAdmin())
 	api.GET("/categories/products/:id", server.getProductsByCategoryId)
+
+	// manufacturer api
+	api.GET("/manufacturers", server.getAllManufacturers)
 
 	// user api
 	api.GET("/users", server.getAllUsers, middlewares.Authenticate(), middlewares.IsAdmin())

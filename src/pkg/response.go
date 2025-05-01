@@ -13,9 +13,12 @@ func ResponseError(message string, err error) map[string]interface{} {
 	}
 }
 
-func ResponseSuccessWithData(message string, data interface{}) map[string]interface{} {
-	return map[string]interface{}{
+func ResponseSuccessWithData(message string, extraFields map[string]interface{}) map[string]interface{} {
+	response := map[string]interface{}{
 		"message": message,
-		"data":    data,
 	}
+	for k, v := range extraFields {
+		response[k] = v
+	}
+	return response
 }

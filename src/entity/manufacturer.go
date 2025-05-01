@@ -11,6 +11,10 @@ type Manufacturer struct {
 	ManufacturerName string `json:"manufacturer_name"`
 }
 
+func (m Manufacturer) TableName() string {
+	return "manufacturer"
+}
+
 func (m *Manufacturer) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {

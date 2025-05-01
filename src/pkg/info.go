@@ -47,4 +47,7 @@ const (
 	InfoGetBestSellersStatisticsSuccess  = "get best sellers statistics success."
 	InfoGetTopCustomersStatisticsSuccess = "get top customers statistics success."
 	InfoGetOrderDetailSuccess            = "get order detail success."
+
+	// Manufacturer
+	InfoGetManufacturersSuccess = "get manufacturers success."
 )

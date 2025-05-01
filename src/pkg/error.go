@@ -42,4 +42,7 @@ const (
 	ErrorGetBestSellersStatistics  = "error get best sellers statistics"
 	ErrorGetTopCustomersStatistics = "error get top customers statistics"
 	ErrorGetOrderDetail            = "error get order detail"
+
+	// Manufacturer
+	ErrorGetManufacturers = "error get manufacturers"
 )

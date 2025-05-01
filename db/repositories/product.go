@@ -22,7 +22,9 @@ func GetAllProducts(db *gorm.DB, query *entity.ProductQuery) ([]entity.Product, 
 			p.tag,
 			jsonb_build_object('category_id', c.category_id, 'category_name', c.category_name) AS category,
 			jsonb_build_object('manufacturer_id', m.manufacturer_id, 'manufacturer_name', m.manufacturer_name) AS manufacturer,
-			COALESCE(jsonb_agg(pi.image_url) FILTER (WHERE pi.image_url IS NOT NULL), '[]'::jsonb) AS images
+			COALESCE(jsonb_agg(pi.image_url) FILTER (WHERE pi.image_url IS NOT NULL), '[]'::jsonb) AS images,
+			p.created_at,
+			p.updated_at
 		FROM product p 
 		LEFT JOIN product_image pi ON pi.product_id = p.product_id
 		LEFT JOIN category c ON c.category_id = p.category_id
@@ -328,7 +330,7 @@ func GetStatisticByCategory(db *gorm.DB) ([]entity.StatisticByCategory, error) {
 			SUM(p.stock) AS quantity
 		FROM category c 
 		LEFT JOIN product p ON c.category_id = p.category_id
-		GROUP BY c.category_id, c.category_name;
+		GROUP BY c.category_id, c.category_name
 		ORDER BY quantity DESC;
 	`
 	err := db.Raw(querySQL).Scan(&results).Error
@@ -349,7 +351,7 @@ func GetStatisticByManufacturer(db *gorm.DB) ([]entity.StatisticByManufacturer, 
 			SUM(p.stock) AS quantity
 		FROM manufacturer m 
 		LEFT JOIN product p ON m.manufacturer_id = p.manufacturer_id
-		GROUP BY m.manufacturer_id, m.manufacturer_name;
+		GROUP BY m.manufacturer_id, m.manufacturer_name
 		ORDER BY quantity DESC;
 	`
 	err := db.Raw(querySQL).Scan(&results).Error

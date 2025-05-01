@@ -8,7 +8,14 @@ import (
 
 func GetAllCategories(db *gorm.DB) ([]entity.Category, error) {
 	categories := []entity.Category{}
-	if err := db.Find(&categories).Error; err != nil {
+	query := `
+		SELECT category.*, COUNT(p.product_id) as product_in_category 
+		FROM category
+		JOIN product p ON p.category_id = category.category_id
+		GROUP BY category.category_id, category.category_name, category.created_at, category.updated_at, category.thumbnail, category.description, category.super_category_id
+	`
+	err := db.Raw(query).Scan(&categories).Error
+	if err != nil {
 		return nil, err
 	}
 	return categories, nil

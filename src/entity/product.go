@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"mime/multipart"
+	"time"
 )
 
 type Product struct {
@@ -16,11 +17,11 @@ type Product struct {
 	Category     Category     `json:"category,omitempty"`
 	Manufacturer Manufacturer `json:"manufacturer,omitempty"`
 	Images       *StringArray `json:"images,omitempty"`
-	CreatedAt    *string      `json:"created_at,omitempty"`
-	UpdatedAt    *string      `json:"updated_at,omitempty"`
 	Discount     *float32     `json:"discount,omitempty"`
 	Type         *string      `json:"type,omitempty"`
 	Tag          *string      `json:"tag,omitempty"`
+	CreatedAt    *time.Time   `json:"created_at,omitempty"`
+	UpdatedAt    *time.Time   `json:"updated_at,omitempty"`
 }
 
 func (p *Product) TableName() string {

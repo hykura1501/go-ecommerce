@@ -5,17 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"mime/multipart"
+	"time"
 )
 
 type Category struct {
-	CategoryId      int        `json:"category_id"`
-	CategoryName    string     `json:"category_name"`
-	Thumbnail       string     `json:"thumbnail"`
-	Description     string     `json:"description"`
-	SuperCategoryId int        `json:"super_category_id"`
-	CreatedAt       string     `json:"created_at"`
-	UpdatedAt       string     `json:"updated_at"`
-	Children        []Category `json:"children,omitempty" gorm:"-"`
+	CategoryId        int        `json:"category_id"`
+	CategoryName      string     `json:"category_name"`
+	Thumbnail         string     `json:"thumbnail"`
+	Description       string     `json:"description"`
+	ProductInCategory int        `json:"product_in_category"`
+	SuperCategoryId   int        `json:"super_category_id"`
+	CreatedAt         *time.Time `json:"created_at"`
+	UpdatedAt         *time.Time `json:"updated_at"`
+	Children          []Category `json:"children,omitempty" gorm:"-"`
 }
 
 func (c *Category) TableName() string {
